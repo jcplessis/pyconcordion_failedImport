@@ -1,1 +1,2 @@
-src/concordion/FolderRunner.py specs
+export PYTHONPATH=./src
+python examples/PythonTest.py
