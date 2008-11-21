@@ -1,3 +1,4 @@
+import os
 
 imports="""
 import java.net.*;
@@ -30,23 +31,38 @@ public String %(name)s(%(args_declaration)s) throws XmlRpcException{
 
 
 class JavaClassGenerator:
-    def __init__(self, python_instance, port):
-        self.python_instance=python_instance
-        self.port = port
     
-    def generate(self):
+    def __init__(self, config=None):
+        if not config:
+            config = {'port':1337}
+        self.config = config
+    
+    def run(self, python_files):
+        result = []
+        for python_file in python_files:
+            java_file = python_file.replace(".py", ".java")
+            python_module = {}
+            execfile(python_file, python_module)
+            python_class = os.path.split(python_file)[1].replace(".py", "");
+            python_instance = python_module[python_class]()
+            java_content = self.generate(python_instance)
+            file(java_file, "w").write(java_content)
+            result.append(python_file.replace(".py", ".java"))
+        return result
+    
+    def generate(self, python_instance):
         return "".join([imports, 
-                        class_declaration%{"name":self.python_instance.__class__.__name__}, 
+                        class_declaration%{"name":python_instance.__class__.__name__}, 
                         attributes, 
-                        setup%self.port,
-                        "\n".join(self.generateMethods()), 
+                        setup%self.config['port'],
+                        "\n".join(self.generateMethods(python_instance)), 
                         footer])
         
-    def generateMethods(self):
+    def generateMethods(self, python_instance):
         methods = []
-        for method_name in dir(self.python_instance):
+        for method_name in dir(python_instance):
             if not method_name.startswith("_"):
-                method = getattr(self.python_instance, method_name)
+                method = getattr(python_instance, method_name)
                 arguments = method.func_code.co_varnames
                 arguments_list=", ".join(arguments[1:])
                 arguments_declaration=", ".join(["String " + x for x in arguments[1:]])

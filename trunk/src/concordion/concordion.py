@@ -37,9 +37,8 @@ def main(the_class, the_file):
     java_directory = os.path.split(the_file)[0]
     java_classname = os.path.basename(java_filename).replace(".java", "")
     
-    java_fixture = open(java_filename, "w")
-    java_fixture.write(JavaClassGenerator(instance, config['server_port']).generate())
-    java_fixture.close()
+
+    JavaClassGenerator().run([the_file])
     
     xmlRpcServer = XMLRPCServer(instance, config['server_port'])
     thread = threading.Thread(target=xmlRpcServer)
