@@ -52,3 +52,21 @@ Here is the content of the html file :
 
 Now you can run the test by simply running the python script : 
   _python MyExampleTest.py_
+
+You should get an output looking like :
+{{{
+JUnit version 3.8.2
+./tmp/MyExample.html
+Successes: 1, Failures: 0
+
+
+Time: 0,729
+
+OK (1 test)
+}}}
+
+And the generated html file should be like :
+
+[http://img505.imageshack.us/img505/6273/concordionhn2.png]
+
+And voilà !
