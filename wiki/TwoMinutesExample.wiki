@@ -1,0 +1,51 @@
+#summary A simple example showing how to use PyConcordion
+#labels Example,Featured
+
+= Introduction =
+
+This is a (very) short example to show how to use PyConcordion.
+In 2 minutes you should see what it really provides and how to write a test.
+
+= Details =
+
+In a folder we create two files : MyExampleTest.py and MyExample.html _(note that the naming is enforced by PyConcordion, if the html is called *X.html*, your fixture must be called *XTest.py* and contain a class whose name is *XTest*)_
+
+Here is the content of MyExampleTest.py :
+{{{
+#! /usr/bin/python
+import concordion
+class MyExampleTest:
+
+   def getMessage(self):
+      return "Concordion supports python"
+
+if __name__ == "__main__":
+   concordion.main(MyExampleTest, __file__)
+
+}}}
+
+Here is the content of the html file : 
+
+{{{
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<body>
+
+    <h1>Python integration</h1>
+
+    <p>
+       <code>pyConcordion</code> let you write concordion test cases in python.
+    </p>
+
+    <div class="example">
+
+        <h3>Example</h3>
+
+                <p>This test is the proof.</p>
+
+                <p concordion:assertEquals="getMessage()">Concordion supports python</p>
+    </div>
+
+
+</body>
+</html>
+}}}
