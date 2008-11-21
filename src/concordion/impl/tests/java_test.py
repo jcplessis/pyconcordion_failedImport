@@ -1,5 +1,5 @@
 import unittest
-from concordion.impl.java_class_generator import JavaClassGenerator
+from concordion.impl.java import JavaClassGenerator
 
 class JavaClassGeneratorTest(unittest.TestCase):
     
