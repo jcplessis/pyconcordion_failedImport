@@ -4,7 +4,7 @@ import threading
 import os, sys
 import SimpleXMLRPCServer
 import popen2
-from impl.java_class_generator import JavaClassGenerator
+from impl.java import JavaClassGenerator
 
 
 class XMLRPCServer:
