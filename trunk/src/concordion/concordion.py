@@ -33,22 +33,20 @@ def main(the_class, the_file):
     config = load_config(installation_path)
     lib_path = os.path.join(installation_path, "lib")
     instance = the_class()
-    java_filename = the_file.replace(".py", ".java")
-    java_directory = os.path.split(the_file)[0]
-    java_classname = os.path.basename(java_filename).replace(".java", "")
     
 
-    JavaClassGenerator().run([the_file])
+    java_filename = JavaClassGenerator().run([the_file])[0]
+    java_classname = os.path.basename(java_filename).replace(".java", "")
     
     xmlRpcServer = XMLRPCServer(instance, config['server_port'])
     thread = threading.Thread(target=xmlRpcServer)
     thread.setDaemon(True)
     thread.start()
 
+    java_directory = os.path.split(the_file)[0]
     jars = [
             "concordion-1.2.0.jar",
             "junit-3.8.2.jar",
-            "junit-4.4.jar",
             "xmlrpc-client-3.1.jar",
             "xmlrpc-common-3.1.jar",
             "xom-1.1.jar",
@@ -65,7 +63,7 @@ def main(the_class, the_file):
     java_class_filename = java_filename.replace(".java", "")
     returned_code = execute_command(config['java_command'] + 
                                     " -Dconcordion.output.dir="+ config['output_folder'] +
-                                    " -cp " + classpath + " org.junit.runner.JUnitCore " + java_classname,
+                                    " -cp " + classpath + " junit.textui.TestRunner " + java_classname,
                                     True)
     os.remove(java_filename)
     os.remove(java_filename.replace('.java', '.class'))
