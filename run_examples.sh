@@ -1,2 +1,2 @@
 export PYTHONPATH=./src
-python examples/PythonTest.py
+python examples/TwoMinutesExampleTest.py
