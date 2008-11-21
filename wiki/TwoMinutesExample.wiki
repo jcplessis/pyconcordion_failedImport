@@ -49,3 +49,6 @@ Here is the content of the html file :
 </body>
 </html>
 }}}
+
+Now you can run the test by simply running the python script : 
+  _python MyExampleTest.py_
