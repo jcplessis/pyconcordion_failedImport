@@ -32,10 +32,10 @@ public String %(name)s(%(args_declaration)s) throws XmlRpcException{
 
 class JavaClassGenerator:
     
-    def __init__(self, config=None):
-        if not config:
-            config = {'port':1337}
-        self.config = config
+    def __init__(self, configuration=None):
+        if not configuration:
+            configuration = {'port':1337}
+        self.configuration = configuration
     
     def run(self, python_files):
         result = []
@@ -54,7 +54,7 @@ class JavaClassGenerator:
         return "".join([imports, 
                         class_declaration%{"name":python_instance.__class__.__name__}, 
                         attributes, 
-                        setup%self.config['port'],
+                        setup%self.configuration['port'],
                         "\n".join(self.generateMethods(python_instance)), 
                         footer])
         
