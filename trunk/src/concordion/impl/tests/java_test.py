@@ -1,5 +1,5 @@
 import unittest, os, shutil
-from concordion.impl.java import JavaClassGenerator
+from concordion.impl.java import JavaClassGenerator, Classpath
 
 class JavaClassGeneratorTest(unittest.TestCase):
     
@@ -10,7 +10,7 @@ class JavaClassGeneratorTest(unittest.TestCase):
         
     def test_can_generate_for_a_single_simple_python_file(self):
         "Class Generator - Can be run on a single simple python file"
-        self._createFile("MyPythonFile.py", """
+        _createFile("MyPythonFile.py", """
 class MyPythonFile:
     pass
 """)
@@ -40,7 +40,7 @@ public class MyPythonFile extends ConcordionTestCase{
 
     def test_can_generate_java_method_for_an_argument_less_python_method(self):
         "Class Generator - Can generate Java method for an argument less python method"
-        self._createFile("MyPythonFile2.py", """
+        _createFile("MyPythonFile2.py", """
 class MyPythonFile2:
     def do_plop(self):
         pass
@@ -55,7 +55,7 @@ public String do_plop() throws XmlRpcException{
 
     def test_can_generate_java_method_for_a_python_method_with_arguments(self):
         "Class Generator - Can generate Java method for a python method with arguments"
-        self._createFile("MyPythonFile3.py", """
+        _createFile("MyPythonFile3.py", """
 class MyPythonFile3:
     def do_plop(self, polop, pilip):
         pass
@@ -71,8 +71,9 @@ public String do_plop(String polop, String pilip) throws XmlRpcException{
         
     def test_can_generate_for_a_simple_python_file_in_another_directory(self):
         "Class Generator - Can generate even for a file that is not in the same directory"
-        os.mkdir("tmp")
-        self._createFile("tmp/MyPythonFile.py", """
+        if not os.path.exists("tmp"):
+            os.mkdir("tmp")
+        _createFile("tmp/MyPythonFile.py", """
 class MyPythonFile:
     pass
 """)
@@ -81,6 +82,33 @@ class MyPythonFile:
         self.assertEquals("tmp/MyPythonFile.java", result[0])
         shutil.rmtree("tmp")
         
-    def _createFile(self, name, content):
-        file(name, "w").write(content)
+    
         
+        
+class ClasspathTest(unittest.TestCase):
+    
+    def setUp(self):
+        if not os.path.exists("lib"):
+            os.mkdir("lib")
+            
+    def tearDown(self):
+        shutil.rmtree("lib");
+    
+    def testEmptyCLassPath(self):
+        "Classpath - can create empty classpath"
+        self.assertEquals("", Classpath("lib").getClasspath())
+        
+    def testClasspathWithOneJar(self):
+        "Classpath - can create classpath with one jar"
+        path = _createFile(os.path.join("lib", "test.jar"), "polop")
+        self.assertEquals(path, Classpath("lib").getClasspath())
+        
+    def testClasspathWithOneJar(self):
+        "Classpath - can create classpath with many jars"
+        path = _createFile(os.path.join("lib", "test.jar"), "polop")
+        path2 = _createFile(os.path.join("lib", "test2.jar"), "polop aussi")
+        self.assertEquals(path + ":" + path2, Classpath("lib").getClasspath())
+        
+def _createFile(name, content):
+        file(name, "w").write(content)
+        return os.path.abspath(name);

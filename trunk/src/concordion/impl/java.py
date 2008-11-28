@@ -1,4 +1,5 @@
 import os
+import glob
 
 imports="""
 import java.net.*;
@@ -68,3 +69,11 @@ class JavaClassGenerator:
                 arguments_declaration=", ".join(["String " + x for x in arguments[1:]])
                 methods.append(method_template%{"name":method_name, "args_declaration":arguments_declaration, "args_list":arguments_list})
         return methods
+    
+class Classpath:
+    def __init__(self, path):
+        self.path = path
+    
+    def getClasspath(self):
+        files = glob.glob(os.path.join(self.path, "*.jar"))
+        return ":".join(map(os.path.abspath, files))
