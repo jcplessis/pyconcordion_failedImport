@@ -4,7 +4,7 @@ import threading
 import os, sys
 import SimpleXMLRPCServer
 import popen2
-from impl.java import JavaClassGenerator
+from impl.java import JavaClassGenerator, Classpath
 
 
 class XMLRPCServer:
@@ -44,26 +44,15 @@ def main(the_class, the_file):
     thread.start()
 
     java_directory = os.path.split(the_file)[0]
-    jars = [
-            "concordion-1.2.0.jar",
-            "junit-3.8.2.jar",
-            "xmlrpc-client-3.1.jar",
-            "xmlrpc-common-3.1.jar",
-            "xom-1.1.jar",
-            "ws-commons-util-1.0.2.jar",
-            "ognl-2.6.9.jar"
-    ]
-    classpath = ""
-    for jar in jars:
-        classpath += os.path.join(lib_path, jar) + ":"
-    classpath += java_directory
+    classpath = Classpath(lib_path)
+    classpath.addDirectory(java_directory)
 
-    execute_command(config['javac_command'] + " -cp " + classpath + " " + java_filename)
+    execute_command(config['javac_command'] + " -cp " + classpath.getClasspath() + " " + java_filename)
     
     java_class_filename = java_filename.replace(".java", "")
     returned_code = execute_command(config['java_command'] + 
                                     " -Dconcordion.output.dir="+ config['output_folder'] +
-                                    " -cp " + classpath + " junit.textui.TestRunner " + java_classname,
+                                    " -cp " + classpath.getClasspath() + " junit.textui.TestRunner " + java_classname,
                                     True)
     os.remove(java_filename)
     os.remove(java_filename.replace('.java', '.class'))
