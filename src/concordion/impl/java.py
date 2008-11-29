@@ -73,7 +73,18 @@ class JavaClassGenerator:
 class Classpath:
     def __init__(self, path):
         self.path = path
+        self.directories = []
     
     def getClasspath(self):
         files = glob.glob(os.path.join(self.path, "*.jar"))
-        return ":".join(map(os.path.abspath, files))
+        absolute_files = map(os.path.abspath, files)
+        absolute_files.extend(self.directories)
+        return ":".join(absolute_files)
+    
+    def addDirectory(self, path):
+        self.directories.append(path)
+    
+    def addDirectories(self, paths):
+        for path in paths:
+            self.addDirectory(path)
+        
