@@ -5,6 +5,7 @@ import os, sys
 import SimpleXMLRPCServer
 import popen2
 from impl.java import JavaClassGenerator, Classpath
+from impl.configuration import FileConfiguration
 
 
 class XMLRPCServer:
@@ -23,14 +24,9 @@ def execute_command(command, display_output=False):
             print line,
     return res
 
-def load_config(config_dir):
-    result = {}
-    execfile(os.path.join(config_dir, "config.ini"), result)
-    return result
-
 def main(the_class, the_file):
     installation_path = os.path.split(__file__)[0]
-    config = load_config(installation_path)
+    config = FileConfiguration(os.path.join(installation_path, "config.ini"))
     lib_path = os.path.join(installation_path, "lib")
     instance = the_class()
     
@@ -38,7 +34,7 @@ def main(the_class, the_file):
     java_filename = JavaClassGenerator().run([the_file])[0]
     java_classname = os.path.basename(java_filename).replace(".java", "")
     
-    xmlRpcServer = XMLRPCServer(instance, config['server_port'])
+    xmlRpcServer = XMLRPCServer(instance, config.get('server_port'))
     thread = threading.Thread(target=xmlRpcServer)
     thread.setDaemon(True)
     thread.start()
@@ -47,11 +43,11 @@ def main(the_class, the_file):
     classpath = Classpath(lib_path)
     classpath.addDirectory(java_directory)
 
-    execute_command(config['javac_command'] + " -cp " + classpath.getClasspath() + " " + java_filename)
+    execute_command(config.get('javac_command') + " -cp " + classpath.getClasspath() + " " + java_filename)
     
     java_class_filename = java_filename.replace(".java", "")
-    returned_code = execute_command(config['java_command'] + 
-                                    " -Dconcordion.output.dir="+ config['output_folder'] +
+    returned_code = execute_command(config.get('java_command') + 
+                                    " -Dconcordion.output.dir="+ config.get('output_folder') +
                                     " -cp " + classpath.getClasspath() + " junit.textui.TestRunner " + java_classname,
                                     True)
     os.remove(java_filename)
