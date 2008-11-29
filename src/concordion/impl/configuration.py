@@ -15,5 +15,6 @@ class FileConfiguration:
         return self.properties.keys()
     
     def get(self, keyname):
+        self._init()
         return self.properties[keyname]
     
