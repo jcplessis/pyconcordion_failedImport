@@ -6,6 +6,7 @@ import SimpleXMLRPCServer
 import popen2
 from impl.java import JavaClassGenerator, Classpath
 from impl.configuration import FileConfiguration
+from impl.executors import CommandExecutor
 
 
 class XMLRPCServer:
@@ -16,13 +17,6 @@ class XMLRPCServer:
     def __call__(self):
         self.server.serve_forever()
 
-def execute_command(command, display_output=False):
-    process =  popen2.Popen4(command)
-    res = process.wait()
-    if res != 0 or display_output: 
-        for line in process.fromchild:
-            print line,
-    return res
 
 def main(the_class, the_file):
     installation_path = os.path.split(__file__)[0]
@@ -43,10 +37,11 @@ def main(the_class, the_file):
     classpath = Classpath(lib_path)
     classpath.addDirectory(java_directory)
 
-    execute_command(config.get('javac_command') + " -cp " + classpath.getClasspath() + " " + java_filename)
+    executor = CommandExecutor()
+    executor.run(config.get('javac_command') + " -cp " + classpath.getClasspath() + " " + java_filename)
     
     java_class_filename = java_filename.replace(".java", "")
-    returned_code = execute_command(config.get('java_command') + 
+    returned_code = executor.run(config.get('java_command') + 
                                     " -Dconcordion.output.dir="+ config.get('output_folder') +
                                     " -cp " + classpath.getClasspath() + " junit.textui.TestRunner " + java_classname,
                                     True)
