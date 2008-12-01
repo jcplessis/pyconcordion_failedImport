@@ -11,7 +11,7 @@ if __name__ == "__main__":
     classpath = Classpath(os.path.join(this_dir, "lib"))
     executor = TestExecutor(
         [JavaFileGenerator(configuration), 
-         JavaFileCompiler(configuration), 
-         JavaFileLauncher(configuration)])
+         JavaFileCompiler(configuration, classpath), 
+         JavaFileLauncher(configuration, classpath)])
     runner = TestRunner(FolderTestFinder(sys.argv), executor)
     runner.run()
