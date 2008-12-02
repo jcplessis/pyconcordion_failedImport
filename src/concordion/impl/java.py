@@ -96,4 +96,11 @@ class JavaFileCompiler:
         
     def compile(self, javaFiles):
         command = " ".join([self.configuration.get("javac_command"), "-cp", self.classpath.getClasspath(), " ".join(javaFiles)])
-        self.executor.run(command)
+        if self.executor.run(command) != 0:
+            raise Exception("Sorry, an exception occured in the compilation process")
+        def modifyExtension(file):
+            name, extension = os.path.splitext(file)
+            return name + ".class"
+            
+        return map(modifyExtension, javaFiles)
+        
