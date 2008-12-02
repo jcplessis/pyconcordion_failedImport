@@ -134,7 +134,22 @@ class JavaFileCompilerTest(unittest.TestCase):
         config.expects(pmock.once()).get(pmock.eq("javac_command")).will(pmock.return_value("myJavac"))
         classpath.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath"))
         executor.expects(pmock.once()).run(pmock.eq("myJavac -cp myclasspath polop/MyClass.java a/pif.java")).will(pmock.return_value(0))
-        JavaFileCompiler(config, classpath, executor).compile(["polop/MyClass.java", "a/pif.java"])
+        result = JavaFileCompiler(config, classpath, executor).compile(["polop/MyClass.java", "a/pif.java"])
+        self.assertEquals(["polop/MyClass.class", "a/pif.class"], result)
+        
+    def testRaisesExceptionInCaseCompilationFails(self):
+        "JavaFileCompiler - raises exception in case compilation fails"
+        executor = pmock.Mock()
+        config = pmock.Mock()
+        classpath = pmock.Mock()
+        config.expects(pmock.once()).method("get").will(pmock.return_value(""))
+        classpath.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath"))
+        executor.expects(pmock.once()).method("run").will(pmock.return_value(1))
+        try:
+            result = JavaFileCompiler(config, classpath, executor).compile(["polop/MyClass.java"])
+            self.fail("Should have raised an exception")
+        except Exception, e:
+            self.assertEquals("Sorry, an exception occured in the compilation process", e.message)
         
         
 def _createFile(name, content):

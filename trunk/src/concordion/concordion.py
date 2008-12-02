@@ -22,12 +22,12 @@ def main(the_class, the_file):
     installation_path = os.path.split(__file__)[0]
     config = FileConfiguration(os.path.join(installation_path, "config.ini"))
     lib_path = os.path.join(installation_path, "lib")
-    instance = the_class()
     
 
     java_filename = JavaClassGenerator().run([the_file])[0]
     java_classname = os.path.basename(java_filename).replace(".java", "")
     
+    instance = the_class()
     xmlRpcServer = XMLRPCServer(instance, config.get('server_port'))
     thread = threading.Thread(target=xmlRpcServer)
     thread.setDaemon(True)
@@ -38,9 +38,8 @@ def main(the_class, the_file):
     classpath.addDirectory(java_directory)
 
     executor = CommandExecutor()
-    JavaFileCompiler(config, classpath, executor).compile([java_filename])
+    java_class_filename = JavaFileCompiler(config, classpath, executor).compile([java_filename])[0]
     
-    java_class_filename = java_filename.replace(".java", "")
     returned_code = executor.run(config.get('java_command') + 
                                     " -Dconcordion.output.dir="+ config.get('output_folder') +
                                     " -cp " + classpath.getClasspath() + " junit.textui.TestRunner " + java_classname,
