@@ -88,3 +88,12 @@ class Classpath:
         for path in paths:
             self.addDirectory(path)
         
+class JavaFileCompiler:
+    def __init__(self, config, classpath, executor):
+        self.configuration = config
+        self.classpath = classpath
+        self.executor = executor
+        
+    def compile(self, javaFiles):
+        command = " ".join([self.configuration.get("javac_command"), "-cp", self.classpath.getClasspath(), " ".join(javaFiles)])
+        self.executor.run(command)
