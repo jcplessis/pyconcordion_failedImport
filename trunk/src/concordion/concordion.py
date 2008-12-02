@@ -4,7 +4,7 @@ import threading
 import os, sys
 import SimpleXMLRPCServer
 import popen2
-from impl.java import JavaClassGenerator, Classpath
+from impl.java import JavaClassGenerator, Classpath, JavaFileCompiler
 from impl.configuration import FileConfiguration
 from impl.executors import CommandExecutor
 
@@ -38,7 +38,7 @@ def main(the_class, the_file):
     classpath.addDirectory(java_directory)
 
     executor = CommandExecutor()
-    executor.run(config.get('javac_command') + " -cp " + classpath.getClasspath() + " " + java_filename)
+    JavaFileCompiler(config, classpath, executor).compile([java_filename])
     
     java_class_filename = java_filename.replace(".java", "")
     returned_code = executor.run(config.get('java_command') + 

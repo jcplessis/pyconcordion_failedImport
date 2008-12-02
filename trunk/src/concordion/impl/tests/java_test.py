@@ -1,5 +1,6 @@
-import unittest, os, shutil
-from concordion.impl.java import JavaClassGenerator, Classpath
+import unittest, os, shutil, pmock
+
+from concordion.impl.java import JavaClassGenerator, Classpath, JavaFileCompiler
 
 class JavaClassGeneratorTest(unittest.TestCase):
     
@@ -123,6 +124,18 @@ class ClasspathTest(unittest.TestCase):
         classpath = Classpath("lib")
         classpath.addDirectories(["lib", "/tmp"])
         self.assertEquals(path + ":" + path2 + ":lib:/tmp", classpath.getClasspath())
+
+class JavaFileCompilerTest(unittest.TestCase):
+    def testCanCompile(self):
+        "JavaFileCompiler - can compile files"
+        executor = pmock.Mock()
+        config = pmock.Mock()
+        classpath = pmock.Mock()
+        config.expects(pmock.once()).get(pmock.eq("javac_command")).will(pmock.return_value("myJavac"))
+        classpath.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath"))
+        executor.expects(pmock.once()).run(pmock.eq("myJavac -cp myclasspath polop/MyClass.java a/pif.java")).will(pmock.return_value(0))
+        JavaFileCompiler(config, classpath, executor).compile(["polop/MyClass.java", "a/pif.java"])
+        
         
 def _createFile(name, content):
         file(name, "w").write(content)
