@@ -44,26 +44,26 @@ class JavaClassGenerator:
             java_file = python_file.replace(".py", ".java")
             python_module = {}
             execfile(python_file, python_module)
-            python_class = os.path.split(python_file)[1].replace(".py", "");
-            python_instance = python_module[python_class]()
-            java_content = self.generate(python_instance)
+            python_class_name = os.path.split(python_file)[1].replace(".py", "");
+            python_class = python_module[python_class_name]
+            java_content = self.generate(python_class)
             file(java_file, "w").write(java_content)
             result.append(python_file.replace(".py", ".java"))
         return result
     
-    def generate(self, python_instance):
+    def generate(self, python_class):
         return "".join([imports, 
-                        class_declaration%{"name":python_instance.__class__.__name__}, 
+                        class_declaration%{"name":python_class.__name__}, 
                         attributes, 
                         setup%self.configuration['port'],
-                        "\n".join(self.generateMethods(python_instance)), 
+                        "\n".join(self.generateMethods(python_class)), 
                         footer])
         
-    def generateMethods(self, python_instance):
+    def generateMethods(self, python_class):
         methods = []
-        for method_name in dir(python_instance):
+        for method_name in dir(python_class):
             if not method_name.startswith("_"):
-                method = getattr(python_instance, method_name)
+                method = getattr(python_class, method_name)
                 arguments = method.func_code.co_varnames
                 arguments_list=", ".join(arguments[1:])
                 arguments_declaration=", ".join(["String " + x for x in arguments[1:]])
