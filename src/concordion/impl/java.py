@@ -104,3 +104,19 @@ class JavaFileCompiler:
             
         return map(modifyExtension, javaFiles)
         
+class JavaTestLauncher:
+    def __init__(self, config, classpath, executor):
+        self.configuration = config
+        self.classpath = classpath
+        self.executor = executor
+        
+    def launch(self, classFile):
+        className = os.path.basename(classFile).replace(".class", "")
+        command = " ".join([self.configuration.get('java_command'),
+                "-Dconcordion.output.dir="+ self.configuration.get('output_folder'),
+                "-cp",
+                self.classpath.getClasspath(),
+                "junit.textui.TestRunner",
+                className])
+        if self.executor.run(command, True) != 0:
+            raise Exception("Sorry, an exception occured in the test launching process")
