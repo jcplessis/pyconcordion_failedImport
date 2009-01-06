@@ -4,7 +4,7 @@ import threading
 import os, sys
 import SimpleXMLRPCServer
 import popen2
-from impl.java import JavaClassGenerator, Classpath, JavaFileCompiler
+from impl.java import JavaClassGenerator, Classpath, JavaFileCompiler, JavaTestLauncher
 from impl.configuration import FileConfiguration
 from impl.executors import CommandExecutor
 
@@ -23,15 +23,14 @@ def main(the_class, the_file):
     config = FileConfiguration(os.path.join(installation_path, "config.ini"))
     lib_path = os.path.join(installation_path, "lib")
     
-
-    java_filename = JavaClassGenerator().run([the_file])[0]
-    java_classname = os.path.basename(java_filename).replace(".java", "")
-    
     instance = the_class()
     xmlRpcServer = XMLRPCServer(instance, config.get('server_port'))
     thread = threading.Thread(target=xmlRpcServer)
     thread.setDaemon(True)
     thread.start()
+
+    java_filename = JavaClassGenerator().run([the_file])[0]
+    
 
     java_directory = os.path.split(the_file)[0]
     classpath = Classpath(lib_path)
@@ -40,11 +39,14 @@ def main(the_class, the_file):
     executor = CommandExecutor()
     java_class_filename = JavaFileCompiler(config, classpath, executor).compile([java_filename])[0]
     
-    returned_code = executor.run(config.get('java_command') + 
-                                    " -Dconcordion.output.dir="+ config.get('output_folder') +
-                                    " -cp " + classpath.getClasspath() + " junit.textui.TestRunner " + java_classname,
-                                    True)
+    JavaTestLauncher(config, classpath, executor).launch(java_class_filename)
+#    java_classname = os.path.basename(java_filename).replace(".java", "")
+#    returned_code = executor.run(config.get('java_command') + 
+#                                    " -Dconcordion.output.dir="+ config.get('output_folder') +
+#                                    " -cp " + classpath.getClasspath() + " junit.textui.TestRunner " + java_classname,
+#                                    True)
+    
+    
+    
     os.remove(java_filename)
     os.remove(java_filename.replace('.java', '.class'))
-    if returned_code != 0 :
-        sys.exit(1)

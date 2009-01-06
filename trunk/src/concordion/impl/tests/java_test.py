@@ -1,6 +1,6 @@
 import unittest, os, shutil, pmock
 
-from concordion.impl.java import JavaClassGenerator, Classpath, JavaFileCompiler
+from concordion.impl.java import JavaClassGenerator, Classpath, JavaFileCompiler, JavaTestLauncher
 
 class JavaClassGeneratorTest(unittest.TestCase):
     
@@ -150,6 +150,35 @@ class JavaFileCompilerTest(unittest.TestCase):
             self.fail("Should have raised an exception")
         except Exception, e:
             self.assertEquals("Sorry, an exception occured in the compilation process", e.message)
+        
+class JavaTestLauncherTest(unittest.TestCase):
+    def testCanLaunchAndReturnOK(self):
+        "JavaTestLauncher - can launch a file and returns OK if executor returns OK"
+        executor = pmock.Mock()
+        config = pmock.Mock()
+        classpath = pmock.Mock()
+        config.expects(pmock.once()).get(pmock.eq("java_command")).will(pmock.return_value("myJava"))
+        config.expects(pmock.once()).get(pmock.eq("output_folder")).will(pmock.return_value("myOutput"))
+        classpath.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath"))
+        executor.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput -cp myclasspath junit.textui.TestRunner MyClass"), pmock.eq(True)).will(pmock.return_value(0))
+        
+        JavaTestLauncher(config, classpath, executor).launch("polop/MyClass.class")
+        
+    def testCanLaunchAndRaiseWhenFailureOccurs(self):
+        "JavaTestLauncher - can launch a file and raise an exception when compile fails"
+        executor = pmock.Mock()
+        config = pmock.Mock()
+        classpath = pmock.Mock()
+        config.expects(pmock.once()).get(pmock.eq("java_command")).will(pmock.return_value(""))
+        config.expects(pmock.once()).get(pmock.eq("output_folder")).will(pmock.return_value(""))
+        classpath.expects(pmock.once()).getClasspath().will(pmock.return_value(""))
+        executor.expects(pmock.once()).method("run").will(pmock.return_value(1))
+        try:
+            result = JavaTestLauncher(config, classpath, executor).launch("")
+            self.fail("Should have raised an exception")
+        except Exception, e:
+            self.assertEquals("Sorry, an exception occured in the test launching process", e.message)
+        
         
         
 def _createFile(name, content):
