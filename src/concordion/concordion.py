@@ -7,15 +7,7 @@ import popen2
 from impl.java import JavaClassGenerator, Classpath, JavaFileCompiler, JavaTestLauncher
 from impl.configuration import FileConfiguration
 from impl.executors import CommandExecutor
-
-
-class XMLRPCServer:
-    def __init__(self, instance, port):
-        self.server = SimpleXMLRPCServer.SimpleXMLRPCServer(("localhost", port), logRequests=False)
-        self.server.register_instance(instance)
-        
-    def __call__(self):
-        self.server.serve_forever()
+from impl.xmlrpc import XmlRpcServer
 
 
 def main(the_class, the_file):
@@ -23,11 +15,7 @@ def main(the_class, the_file):
     config = FileConfiguration(os.path.join(installation_path, "config.ini"))
     lib_path = os.path.join(installation_path, "lib")
     
-    instance = the_class()
-    xmlRpcServer = XMLRPCServer(instance, config.get('server_port'))
-    thread = threading.Thread(target=xmlRpcServer)
-    thread.setDaemon(True)
-    thread.start()
+    
 
     java_filename = JavaClassGenerator().run([the_file])[0]
     
@@ -39,14 +27,10 @@ def main(the_class, the_file):
     executor = CommandExecutor()
     java_class_filename = JavaFileCompiler(config, classpath, executor).compile([java_filename])[0]
     
+    xmlRpcServer = XmlRpcServer(the_file, config)
+    xmlRpcServer.launch()
     JavaTestLauncher(config, classpath, executor).launch(java_class_filename)
-#    java_classname = os.path.basename(java_filename).replace(".java", "")
-#    returned_code = executor.run(config.get('java_command') + 
-#                                    " -Dconcordion.output.dir="+ config.get('output_folder') +
-#                                    " -cp " + classpath.getClasspath() + " junit.textui.TestRunner " + java_classname,
-#                                    True)
-    
-    
+    xmlRpcServer.stop()
     
     os.remove(java_filename)
     os.remove(java_filename.replace('.java', '.class'))
