@@ -3,7 +3,6 @@
 import threading
 import os, sys
 import SimpleXMLRPCServer
-import popen2
 from impl.java import JavaClassGenerator, Classpath, JavaFileCompiler, JavaTestLauncher
 from impl.configuration import FileConfiguration
 from impl.executors import CommandExecutor
@@ -14,11 +13,8 @@ def main(the_class, the_file):
     installation_path = os.path.split(__file__)[0]
     config = FileConfiguration(os.path.join(installation_path, "config.ini"))
     lib_path = os.path.join(installation_path, "lib")
-    
-    
 
     java_filename = JavaClassGenerator().run([the_file])[0]
-    
 
     java_directory = os.path.split(the_file)[0]
     classpath = Classpath(lib_path)
