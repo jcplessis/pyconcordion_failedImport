@@ -6,6 +6,12 @@ class XmlRpcServer:
         self.file = file
         self.configuration = configuration
     
+    def get_file(self):
+        return self.file
+    
+    def set_file(self, file):
+        self.file = file
+    
     def launch(self):
         module_name = os.path.basename(self.file).replace(".pyc", "").replace(".py", "")
         exec "import " + module_name
