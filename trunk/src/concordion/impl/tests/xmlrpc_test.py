@@ -15,6 +15,13 @@ class XmlRpcServerTest(unittest.TestCase):
         self.assertAvailable()
         server.stop()
         self.assertNotAvailable()
+    
+    def testCanGetFile(self):
+        "XmlRpcServer - can get_file and set_file"
+        server = XmlRpcServer("polop", None)
+        self.assertEquals("polop", server.get_file())
+        server.set_file("pilip")
+        self.assertEquals("pilip", server.get_file())
         
     def assertNotAvailable(self):
         server = xmlrpclib.ServerProxy("http://localhost:8000")
