@@ -9,19 +9,12 @@ class XmlRpcServerTest(unittest.TestCase):
         "XmlRpcServer - can be launched and stopped"
         config = pmock.Mock()
         config.expects(pmock.once()).get(pmock.eq("server_port")).will(pmock.return_value("8000"))
-        server = XmlRpcServer(__file__, config)
+        server = XmlRpcServer(config)
         self.assertNotAvailable()
-        server.launch()
+        server.launch(__file__)
         self.assertAvailable()
         server.stop()
         self.assertNotAvailable()
-    
-    def testCanGetFile(self):
-        "XmlRpcServer - can get_file and set_file"
-        server = XmlRpcServer("polop", None)
-        self.assertEquals("polop", server.get_file())
-        server.set_file("pilip")
-        self.assertEquals("pilip", server.get_file())
         
     def assertNotAvailable(self):
         server = xmlrpclib.ServerProxy("http://localhost:8000")
