@@ -2,18 +2,11 @@ import os, threading
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 class XmlRpcServer:
-    def __init__(self, file, configuration):
-        self.file = file
+    def __init__(self, configuration):
         self.configuration = configuration
     
-    def get_file(self):
-        return self.file
-    
-    def set_file(self, file):
-        self.file = file
-    
-    def launch(self):
-        module_name = os.path.basename(self.file).replace(".pyc", "").replace(".py", "")
+    def launch(self, file):
+        module_name = os.path.basename(file).replace(".pyc", "").replace(".py", "")
         exec "import " + module_name
         exec "instance=" + module_name + "." + module_name + "()"
         self.server = XMLRPCServerThread(instance, int(self.configuration.get("server_port")))
