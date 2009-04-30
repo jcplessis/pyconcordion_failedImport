@@ -7,6 +7,7 @@ from impl.java import JavaClassGenerator, Classpath, JavaFileCompiler, JavaTestL
 from impl.configuration import FileConfiguration
 from impl.executors import CommandExecutor
 from impl.xmlrpc import XmlRpcServer
+from impl.launcher import TestLauncher
 
 
 def main(the_class, the_file):
@@ -23,10 +24,9 @@ def main(the_class, the_file):
     executor = CommandExecutor()
     java_class_filename = JavaFileCompiler(config, classpath, executor).compile([java_filename])[0]
     
-    xmlRpcServer = XmlRpcServer(the_file, config)
-    xmlRpcServer.launch()
-    JavaTestLauncher(config, classpath, executor).launch(java_class_filename)
-    xmlRpcServer.stop()
+    xmlRpcServer = XmlRpcServer(config)
+    java_launcher = JavaTestLauncher(config, classpath, executor)
+    TestLauncher(xmlRpcServer, java_launcher).launch([(the_file, java_class_filename)])
     
     os.remove(java_filename)
     os.remove(java_filename.replace('.java', '.class'))
