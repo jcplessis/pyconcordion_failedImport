@@ -83,6 +83,9 @@ class Classpath:
     
     def addDirectory(self, path):
         self.directories.append(path)
+        
+    def removeDirectory(self, path):
+        self.directories.remove(path)
     
     def addDirectories(self, paths):
         for path in paths:
@@ -112,11 +115,15 @@ class JavaTestLauncher:
         
     def launch(self, classFile):
         className = os.path.basename(classFile).replace(".class", "")
+        directory = os.path.split(classFile)[0]
+        self.classpath.addDirectory(directory)
         command = " ".join([self.configuration.get('java_command'),
                 "-Dconcordion.output.dir="+ self.configuration.get('output_folder'),
                 "-cp",
                 self.classpath.getClasspath(),
                 "junit.textui.TestRunner",
                 className])
-        if self.executor.run(command, True) != 0:
+        execution_result = self.executor.run(command, True)
+        self.classpath.removeDirectory(directory)
+        if execution_result != 0:
             raise Exception("Sorry, an exception occured in the test launching process")
