@@ -1,2 +1,2 @@
-export PYTHONPATH=./src
-python -t examples/TwoMinutesExampleTest.py
+export PYTHONPATH=./src:./examples
+python -t src/concordion/folder_runner.py ./examples
