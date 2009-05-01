@@ -19,7 +19,6 @@ def main(the_file):
 
     java_directory = os.path.split(the_file)[0]
     classpath = Classpath(lib_path)
-    #classpath.addDirectory(java_directory)
 
     executor = CommandExecutor()
     java_class_filename = JavaFileCompiler(config, classpath, executor).compile([java_filename])[0]
