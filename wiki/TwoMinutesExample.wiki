@@ -13,7 +13,7 @@ In a folder we create two files : MyExampleTest.py and MyExample.html _(note tha
 Here is the content of MyExampleTest.py :
 {{{
 #! /usr/bin/python
-import concordion
+
 class MyExampleTest:
 
    def getMessage(self):
