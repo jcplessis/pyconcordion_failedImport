@@ -38,7 +38,7 @@ public class MyPythonFile extends ConcordionTestCase{
 }""", file(result[0]).read())
         os.remove("MyPythonFile.py")
         os.remove("MyPythonFile.java")
-
+        
     def test_can_generate_java_method_for_an_argument_less_python_method(self):
         "Class Generator - Can generate Java method for an argument less python method"
         _createFile("MyPythonFile2.py", """
@@ -105,6 +105,13 @@ class ClasspathTest(unittest.TestCase):
         classpath.addDirectory("/tmp")
         self.assertEquals("/tmp", classpath.getClasspath())
         
+    def testCanRemoveADirectory(self):
+        "Classpath - can remove a directory"
+        classpath = Classpath("lib")
+        classpath.addDirectory("/tmp")
+        classpath.removeDirectory("/tmp")
+        self.assertEquals("", classpath.getClasspath())
+        
         
     def testClasspathWithOneJar(self):
         "Classpath - can create classpath with one jar"
@@ -160,9 +167,25 @@ class JavaTestLauncherTest(unittest.TestCase):
         config.expects(pmock.once()).get(pmock.eq("java_command")).will(pmock.return_value("myJava"))
         config.expects(pmock.once()).get(pmock.eq("output_folder")).will(pmock.return_value("myOutput"))
         classpath.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath"))
+        classpath.expects(pmock.once()).addDirectory(pmock.eq("polop"))
+        classpath.expects(pmock.once()).removeDirectory(pmock.eq("polop"))
         executor.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput -cp myclasspath junit.textui.TestRunner MyClass"), pmock.eq(True)).will(pmock.return_value(0))
         
         JavaTestLauncher(config, classpath, executor).launch("polop/MyClass.class")
+        
+    def testAddsAndRemovesDirectoriesFromClasspath(self):
+        "JavaTestLauncher - when launching a file it adds the directory to the classpath and removes it after"
+        mock = pmock.Mock()
+        mock.expects(pmock.once()).get(pmock.eq("java_command")).will(pmock.return_value("myJava"))
+        mock.expects(pmock.once()).get(pmock.eq("output_folder")).will(pmock.return_value("myOutput"))
+        
+        mock.expects(pmock.once()).addDirectory(pmock.eq("polop")).id("add")
+        mock.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath;polop")).after("add").id("getPath")
+        mock.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput -cp myclasspath;polop junit.textui.TestRunner MyClass"), pmock.eq(True)) \
+            .will(pmock.return_value(0)).id("exec").after("getPath")
+        mock.expects(pmock.once()).removeDirectory(pmock.eq("polop")).after("exec")
+        
+        JavaTestLauncher(mock, mock, mock).launch("polop/MyClass.class")
         
     def testCanLaunchAndRaiseWhenFailureOccurs(self):
         "JavaTestLauncher - can launch a file and raise an exception when compile fails"
@@ -172,6 +195,9 @@ class JavaTestLauncherTest(unittest.TestCase):
         config.expects(pmock.once()).get(pmock.eq("java_command")).will(pmock.return_value(""))
         config.expects(pmock.once()).get(pmock.eq("output_folder")).will(pmock.return_value(""))
         classpath.expects(pmock.once()).getClasspath().will(pmock.return_value(""))
+        classpath.expects(pmock.once()).addDirectory(pmock.eq(""))
+        classpath.expects(pmock.once()).removeDirectory(pmock.eq(""))
+
         executor.expects(pmock.once()).method("run").will(pmock.return_value(1))
         try:
             result = JavaTestLauncher(config, classpath, executor).launch("")
