@@ -1,0 +1,34 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<link href="../../../../concordion.css" rel="stylesheet" type="text/css" />
+<body>
+
+    <h1>Python integration with arrays</h1>
+
+    <p>
+       <code>pyConcordion</code> let you write concordion test cases in python with list of dicts or list of objects.
+    </p>
+
+    <div class="example">
+
+        <h3>Example</h3>
+
+		We can use concordion:verifyRows to check the values in a python dict.
+		<table concordion:verifyRows="#user : getUsersAsDict()">
+		    <tr><th concordion:assertEquals="#user.name">Name</th><th concordion:assertEquals="#user.age">Age</th></tr>
+		    <tr><td>Britney</td><td>30</td></tr>
+		    <tr><td>Madonna</td><td>50</td></tr>
+		</table>
+
+		We can also use concordion:verifyRows to check the fields in a python objects.		
+		<table concordion:verifyRows="#user : getUsersAsObj()">
+		    <tr><th concordion:assertEquals="#user.name">Name</th><th concordion:assertEquals="#user.age">Age</th></tr>
+		    <tr><td>Britney</td><td>30</td></tr>
+		    <tr><td>Madonna</td><td>50</td></tr>
+		</table>
+	    
+
+    </div>
+
+
+</body>
+</html>
