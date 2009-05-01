@@ -13,16 +13,13 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 directory = sys.argv[1]
-print directory
 python_files = FolderTestFinder(directory).find_files()
-print "Found files :", python_files
 installation_path = os.path.split(__file__)[0]
 config = FileConfiguration(os.path.join(installation_path, "config.ini"))
 lib_path = os.path.join(installation_path, "lib")
 classpath = Classpath(lib_path)
 
 java_files = JavaClassGenerator().run(python_files)
-print "Generated files :", java_files
 
 executor = CommandExecutor()
 
