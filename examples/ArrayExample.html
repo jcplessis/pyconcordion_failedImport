@@ -1,0 +1,40 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<link href="../../../../concordion.css" rel="stylesheet" type="text/css" />
+<body>
+
+    <h1>Python integration with arrays</h1>
+
+    <p>
+       <code>pyConcordion</code> let you write concordion test cases in python even with arrays.
+    </p>
+
+    <div class="example">
+
+        <h3>Example</h3>
+
+		<p>This test is the proof.</p>
+		
+		We add those users using concordion:execute.
+		<table concordion:execute="addUser(#username)">
+	        <tr><th concordion:set="#username">Username</th></tr>
+	        <tr><td>john.lennon</td></tr>
+	        <tr><td>ringo.starr</td></tr>
+	        <tr><td>george.harrison</td></tr>
+	        <tr><td>paul.mccartney</td></tr>
+	    </table>
+	
+	    <p>We want all users !</p>
+	
+	    <table concordion:verifyRows="#username : getUsers()">
+	        <tr><th concordion:assertEquals="#username">Usernames</th></tr>
+	        <tr><td>john.lennon</td></tr>
+	        <tr><td>ringo.starr</td></tr>
+	        <tr><td>george.harrison</td></tr>
+	        <tr><td>paul.mccartney</td></tr>
+	    </table>
+
+    </div>
+
+
+</body>
+</html>
