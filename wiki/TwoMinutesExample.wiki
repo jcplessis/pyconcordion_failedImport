@@ -19,9 +19,6 @@ class MyExampleTest:
    def getMessage(self):
       return "Concordion supports python"
 
-if __name__ == "__main__":
-   concordion.main(MyExampleTest, __file__)
-
 }}}
 
 Here is the content of the html file : 
@@ -50,8 +47,8 @@ Here is the content of the html file :
 </html>
 }}}
 
-Now you can run the test by simply running the python script : 
-  _python MyExampleTest.py_
+Now you can run the test by simply running the python script provided: 
+  _python2.6 folder_runner.py folder_containing_tests_
 
 You should get an output looking like :
 {{{
