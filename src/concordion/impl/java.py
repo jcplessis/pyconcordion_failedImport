@@ -7,6 +7,8 @@ import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.XmlRpcException;
 import org.concordion.integration.junit3.ConcordionTestCase;
+import java.lang.reflect.Array;
+import java.util.*;
 """
 class_declaration="""
 public class %(name)s extends ConcordionTestCase{
@@ -26,8 +28,16 @@ footer="""
 }"""
 
 method_template = """
-public String %(name)s(%(args_declaration)s) throws XmlRpcException{
-    return (String) this.client.execute("%(name)s", new Object[]{%(args_list)s});
+public Object %(name)s(%(args_declaration)s) throws XmlRpcException{
+    Object result = this.client.execute("%(name)s", new Object[]{%(args_list)s});
+    if(result.getClass().isArray()){
+        List<Object> list = new ArrayList<Object>();
+        for(int i = 0; i < Array.getLength(result); i++){
+            list.add(Array.get(result, i));
+        }
+        return list;
+    }
+    return result;
 }"""
 
 
