@@ -6,4 +6,4 @@ class TwoMinutesExampleTest:
 		return "Concordion supports python"
 	
 if __name__ == '__main__':
-	concordion.main(TwoMinutesExampleTest, __file__)
+	concordion.main(__file__)
