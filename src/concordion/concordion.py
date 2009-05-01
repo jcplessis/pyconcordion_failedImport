@@ -10,7 +10,7 @@ from impl.xmlrpc import XmlRpcServer
 from impl.launcher import TestLauncher
 
 
-def main(the_class, the_file):
+def main(the_file):
     installation_path = os.path.split(__file__)[0]
     config = FileConfiguration(os.path.join(installation_path, "config.ini"))
     lib_path = os.path.join(installation_path, "lib")
