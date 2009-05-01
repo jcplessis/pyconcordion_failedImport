@@ -24,6 +24,8 @@ import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.XmlRpcException;
 import org.concordion.integration.junit3.ConcordionTestCase;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class MyPythonFile extends ConcordionTestCase{
 
@@ -48,8 +50,16 @@ class MyPythonFile2:
 """)
         JavaClassGenerator().run(["MyPythonFile2.py"])
         self.assertTrue(file("MyPythonFile2.java").read().find("""
-public String do_plop() throws XmlRpcException{
-    return (String) this.client.execute("do_plop", new Object[]{});
+public Object do_plop() throws XmlRpcException{
+    Object result = this.client.execute("do_plop", new Object[]{});
+    if(result.getClass().isArray()){
+        List<Object> list = new ArrayList<Object>();
+        for(int i = 0; i < Array.getLength(result); i++){
+            list.add(Array.get(result, i));
+        }
+        return list;
+    }
+    return result;
 }""")>=0)
         os.remove("MyPythonFile2.py")
         os.remove("MyPythonFile2.java")
@@ -63,8 +73,16 @@ class MyPythonFile3:
 """)
         JavaClassGenerator().run(["MyPythonFile3.py"])
         self.assertTrue(file("MyPythonFile3.java").read().find("""
-public String do_plop(String polop, String pilip) throws XmlRpcException{
-    return (String) this.client.execute("do_plop", new Object[]{polop, pilip});
+public Object do_plop(String polop, String pilip) throws XmlRpcException{
+    Object result = this.client.execute("do_plop", new Object[]{polop, pilip});
+    if(result.getClass().isArray()){
+        List<Object> list = new ArrayList<Object>();
+        for(int i = 0; i < Array.getLength(result); i++){
+            list.add(Array.get(result, i));
+        }
+        return list;
+    }
+    return result;
 }""")>=0)
         os.remove("MyPythonFile3.py")
         os.remove("MyPythonFile3.java")
@@ -156,7 +174,7 @@ class JavaFileCompilerTest(unittest.TestCase):
             result = JavaFileCompiler(config, classpath, executor).compile(["polop/MyClass.java"])
             self.fail("Should have raised an exception")
         except Exception, e:
-            self.assertEquals("Sorry, an exception occured in the compilation process", e.message)
+            self.assertEquals("Sorry, an exception occured in the compilation process", str(e)  )
         
 class JavaTestLauncherTest(unittest.TestCase):
     def testCanLaunchAndReturnOK(self):
@@ -203,7 +221,7 @@ class JavaTestLauncherTest(unittest.TestCase):
             result = JavaTestLauncher(config, classpath, executor).launch("")
             self.fail("Should have raised an exception")
         except Exception, e:
-            self.assertEquals("Sorry, an exception occured in the test launching process", e.message)
+            self.assertEquals("Sorry, an exception occured in the test launching process", str(e))
         
         
         
