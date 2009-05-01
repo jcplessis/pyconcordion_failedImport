@@ -63,6 +63,31 @@ public Object do_plop() throws XmlRpcException{
 }""")>=0)
         os.remove("MyPythonFile2.py")
         os.remove("MyPythonFile2.java")
+    
+    # This test is a bug fix !    
+    def test_can_generate_correct_java_even_if_method_contains_variables(self):
+        "Class Generator - Can generate Java method even if python contains local variables"
+        
+        _createFile("MyPythonFile2.py", """
+class MyPythonFile2:
+    def do_plop(self):
+        local_variable = "polop"
+""")
+        JavaClassGenerator().run(["MyPythonFile2.py"])
+        self.assertTrue(file("MyPythonFile2.java").read().find("""
+public Object do_plop() throws XmlRpcException{
+    Object result = this.client.execute("do_plop", new Object[]{});
+    if(result.getClass().isArray()){
+        List<Object> list = new ArrayList<Object>();
+        for(int i = 0; i < Array.getLength(result); i++){
+            list.add(Array.get(result, i));
+        }
+        return list;
+    }
+    return result;
+}""")>=0)
+        os.remove("MyPythonFile2.py")
+        os.remove("MyPythonFile2.java")
 
     def test_can_generate_java_method_for_a_python_method_with_arguments(self):
         "Class Generator - Can generate Java method for a python method with arguments"
