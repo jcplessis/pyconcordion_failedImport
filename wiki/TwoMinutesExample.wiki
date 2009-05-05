@@ -3,12 +3,12 @@
 
 = Introduction =
 
-This is a (very) short example to show how to use !PyConcordion.
+This is a (very) short example to show how to use PyConcordion.
 In 2 minutes you should see what it really provides and how to write a test.
 
 = Details =
 
-In a folder we create two files : !MyExampleTest.py and !MyExample.html _(note that the naming is enforced by !PyConcordion, if the html is called *X.html*, your fixture must be called !*XTest.py* and contain a class whose name is !*XTest*)_
+In a folder we create two files : !MyExampleTest.py and !MyExample.html _(note that the naming is enforced by !PyConcordion, if the html is called *X.html*, your fixture must be called *XTest.py* and contain a class whose name is *XTest*)_
 
 Here is the content of !MyExampleTest.py :
 {{{
@@ -37,9 +37,9 @@ Here is the content of the html file :
 
         <h3>Example</h3>
 
-                <p>This test is the proof.</p>
+        <p>This test is the proof.</p>
 
-                <p concordion:assertEquals="getMessage()">Concordion supports python</p>
+        <p concordion:assertEquals="getMessage()">Concordion supports python</p>
     </div>
 
 
