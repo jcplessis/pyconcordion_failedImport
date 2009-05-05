@@ -1,16 +1,16 @@
-#summary A simple example showing how to use PyConcordion
+#summary A simple example showing how to use !PyConcordion
 #labels Example,Featured
 
 = Introduction =
 
-This is a (very) short example to show how to use PyConcordion.
+This is a (very) short example to show how to use !PyConcordion.
 In 2 minutes you should see what it really provides and how to write a test.
 
 = Details =
 
-In a folder we create two files : MyExampleTest.py and MyExample.html _(note that the naming is enforced by PyConcordion, if the html is called *X.html*, your fixture must be called *XTest.py* and contain a class whose name is *XTest*)_
+In a folder we create two files : !MyExampleTest.py and !MyExample.html _(note that the naming is enforced by !PyConcordion, if the html is called *X.html*, your fixture must be called *!st.py* and contain a class whose name is *!XTest*)_
 
-Here is the content of MyExampleTest.py :
+Here is the content of !MyExampleTest.py :
 {{{
 #! /usr/bin/python
 
@@ -66,4 +66,4 @@ And the generated html file should be like :
 
 [http://img505.imageshack.us/img505/6273/concordionhn2.png]
 
-And voilà !
+You're now ready to write your own tests !
