@@ -1,9 +1,9 @@
-#summary A simple example showing how to use !PyConcordion
+#summary A simple example showing how to use PyConcordion
 #labels Example,Featured
 
 = Introduction =
 
-This is a (very) short example to show how to use PyConcordion.
+This is a (very) short example to show how to use !PyConcordion.
 In 2 minutes you should see what it really provides and how to write a test.
 
 = Details =
