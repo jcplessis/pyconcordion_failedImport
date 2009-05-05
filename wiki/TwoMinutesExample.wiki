@@ -8,7 +8,7 @@ In 2 minutes you should see what it really provides and how to write a test.
 
 = Details =
 
-In a folder we create two files : !MyExampleTest.py and !MyExample.html _(note that the naming is enforced by !PyConcordion, if the html is called *X.html*, your fixture must be called *!st.py* and contain a class whose name is *!XTest*)_
+In a folder we create two files : !MyExampleTest.py and !MyExample.html _(note that the naming is enforced by !PyConcordion, if the html is called *X.html*, your fixture must be called !*XTest.py* and contain a class whose name is !*XTest*)_
 
 Here is the content of !MyExampleTest.py :
 {{{
