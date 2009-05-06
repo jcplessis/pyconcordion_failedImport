@@ -1,4 +1,4 @@
-import os, threading
+import os, threading, sys
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 class XmlRpcServer:
@@ -7,6 +7,8 @@ class XmlRpcServer:
     
     def launch(self, file):
         module_name = os.path.basename(file).replace(".pyc", "").replace(".py", "")
+        dir = os.path.dirname(file)
+        sys.path.append(dir)
         exec "import " + module_name
         exec "instance=" + module_name + "." + module_name + "()"
         self.server = XMLRPCServerThread(instance, int(self.configuration.get("server_port")))
