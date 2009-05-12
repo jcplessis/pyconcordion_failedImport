@@ -1,6 +1,10 @@
 import os
 import glob
 
+package = """
+package %s
+"""
+
 imports="""
 import java.net.*;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -52,6 +56,7 @@ class JavaClassGenerator:
         result = []
         for python_file in python_files:
             java_file = python_file.replace(".py", ".java")
+            print java_file
             python_module = {}
             execfile(python_file, python_module)
             python_class_name = os.path.split(python_file)[1].replace(".py", "");
@@ -128,7 +133,7 @@ class JavaTestLauncher:
         directory = os.path.split(classFile)[0]
         self.classpath.addDirectory(directory)
         command = " ".join([self.configuration.get('java_command'),
-                "-Dconcordion.output.dir="+ self.configuration.get('output_folder'),
+                "-Dconcordion.output.dir="+ os.path.join(self.configuration.get('output_folder'), directory),
                 "-cp",
                 self.classpath.getClasspath(),
                 "junit.textui.TestRunner",
