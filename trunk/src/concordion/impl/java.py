@@ -56,7 +56,6 @@ class JavaClassGenerator:
         result = []
         for python_file in python_files:
             java_file = python_file.replace(".py", ".java")
-            print java_file
             python_module = {}
             execfile(python_file, python_module)
             python_class_name = os.path.split(python_file)[1].replace(".py", "");
