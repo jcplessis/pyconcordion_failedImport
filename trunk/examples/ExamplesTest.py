@@ -1,0 +1,2 @@
+class ExamplesTest:
+	pass

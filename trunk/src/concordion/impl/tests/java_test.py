@@ -212,7 +212,7 @@ class JavaTestLauncherTest(unittest.TestCase):
         classpath.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath"))
         classpath.expects(pmock.once()).addDirectory(pmock.eq("polop"))
         classpath.expects(pmock.once()).removeDirectory(pmock.eq("polop"))
-        executor.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput -cp myclasspath junit.textui.TestRunner MyClass"), pmock.eq(True)).will(pmock.return_value(0))
+        executor.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput/polop -cp myclasspath junit.textui.TestRunner MyClass"), pmock.eq(True)).will(pmock.return_value(0))
         
         JavaTestLauncher(config, classpath, executor).launch("polop/MyClass.class")
         
@@ -224,7 +224,7 @@ class JavaTestLauncherTest(unittest.TestCase):
         
         mock.expects(pmock.once()).addDirectory(pmock.eq("polop")).id("add")
         mock.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath;polop")).after("add").id("getPath")
-        mock.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput -cp myclasspath;polop junit.textui.TestRunner MyClass"), pmock.eq(True)) \
+        mock.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput/polop -cp myclasspath;polop junit.textui.TestRunner MyClass"), pmock.eq(True)) \
             .will(pmock.return_value(0)).id("exec").after("getPath")
         mock.expects(pmock.once()).removeDirectory(pmock.eq("polop")).after("exec")
         
