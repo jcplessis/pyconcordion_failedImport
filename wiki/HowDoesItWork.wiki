@@ -1,6 +1,6 @@
 #summary How does PyConcordion works
 
-PyConcordion is fully based on Concordion, here is the idea :
+!PyConcordion is fully based on Concordion, here is the idea :
 
     * Your python test class is deployed into an xml-rpc server,
     * a Java concordion test case source code is generated from your python class, each method of your python class becomes a method in the java class and this method makes an xml-rpc call to the python server
