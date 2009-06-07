@@ -93,7 +93,7 @@ class Classpath:
         files = glob.glob(os.path.join(self.path, "*.jar"))
         absolute_files = map(os.path.abspath, files)
         absolute_files.extend(self.directories)
-        return ":".join(absolute_files)
+        return '"' + os.pathsep.join(absolute_files) + '"'
     
     def addDirectory(self, path):
         self.directories.append(path)
