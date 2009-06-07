@@ -2,7 +2,7 @@
 
 = Introduction =
 
-A few restrictions are placed on current version of PyConcordion, due to lack of time or technical problems.
+A few restrictions are placed on current version of !PyConcordion, due to lack of time or technical problems.
 
 
 = Details =
