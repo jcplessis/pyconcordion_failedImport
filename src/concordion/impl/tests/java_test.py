@@ -140,32 +140,32 @@ class ClasspathTest(unittest.TestCase):
     
     def testEmptyClassPath(self):
         "Classpath - can create empty classpath"
-        self.assertEquals("", Classpath("lib").getClasspath())
+        self.assertEquals('""', Classpath("lib").getClasspath())
         
     def testCanAddADirectoryToAnEmptyClasspath(self):
         "Classpath - can add a directory to empty classpath"
         classpath = Classpath("lib")
         classpath.addDirectory("/tmp")
-        self.assertEquals("/tmp", classpath.getClasspath())
+        self.assertEquals('"/tmp"', classpath.getClasspath())
         
     def testCanRemoveADirectory(self):
         "Classpath - can remove a directory"
         classpath = Classpath("lib")
         classpath.addDirectory("/tmp")
         classpath.removeDirectory("/tmp")
-        self.assertEquals("", classpath.getClasspath())
+        self.assertEquals('""', classpath.getClasspath())
         
         
     def testClasspathWithOneJar(self):
         "Classpath - can create classpath with one jar"
         path = _createFile(os.path.join("lib", "test.jar"), "polop")
-        self.assertEquals(path, Classpath("lib").getClasspath())
+        self.assertEquals('"' + path + '"', Classpath("lib").getClasspath())
         
     def testClasspathWithManyJar(self):
         "Classpath - can create classpath with many jars"
         path = _createFile(os.path.join("lib", "test.jar"), "polop")
         path2 = _createFile(os.path.join("lib", "test2.jar"), "polop aussi")
-        self.assertEquals(path + ":" + path2, Classpath("lib").getClasspath())
+        self.assertEquals('"' + path + ":" + path2 + '"', Classpath("lib").getClasspath())
         
     def testClasspathWithManyDirectoriesAdded(self):
         "Classpath - can add many directories to a classpath"
@@ -173,7 +173,7 @@ class ClasspathTest(unittest.TestCase):
         path2 = _createFile(os.path.join("lib", "test2.jar"), "polop aussi")
         classpath = Classpath("lib")
         classpath.addDirectories(["lib", "/tmp"])
-        self.assertEquals(path + ":" + path2 + ":lib:/tmp", classpath.getClasspath())
+        self.assertEquals('"' + path + ":" + path2 + ":lib:/tmp" + '"', classpath.getClasspath())
 
 class JavaFileCompilerTest(unittest.TestCase):
     def testCanCompile(self):
