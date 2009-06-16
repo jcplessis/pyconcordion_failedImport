@@ -1,0 +1,21 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<body>
+
+    <h1>Python integration</h1>
+
+    <p>
+       <code>pyConcordion</code> supports annotations (@ExpectedToFail, @Unimplemented, @ExpectedToPass (by default))
+    </p>
+
+    <div class="example">
+
+        <h3>Example</h3>
+
+		<p>This test fails (following cell in red) but the process still reports success.</p>
+		
+		<p concordion:assertTrue="isFalse()">This is should be true but is not !</p>		
+    </div>
+
+
+</body>
+</html>
