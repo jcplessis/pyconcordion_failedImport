@@ -139,5 +139,4 @@ class JavaTestLauncher:
                 className])
         execution_result = self.executor.run(command, True)
         self.classpath.removeDirectory(directory)
-        if execution_result != 0:
-            raise Exception("Sorry, an exception occured in the test launching process")
+        return execution_result

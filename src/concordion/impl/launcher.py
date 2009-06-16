@@ -6,7 +6,9 @@ class TestLauncher:
         self.test_launcher = test_launcher
     
     def launch(self, tests):
+        result = 0
         for (python_file, java_class) in tests:
             self.xml_server.launch(python_file)
-            self.test_launcher.launch(java_class)
+            result += self.test_launcher.launch(java_class)
             self.xml_server.stop()
+        return result

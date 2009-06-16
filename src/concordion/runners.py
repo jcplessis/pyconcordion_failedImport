@@ -27,9 +27,11 @@ class FolderRunner:
         for i in range(len(python_files)):
             python_and_java.append((python_files[i], java_class_filenames[i]))
         
-        TestLauncher(xmlRpcServer, java_launcher).launch(python_and_java)
+        test_result = TestLauncher(xmlRpcServer, java_launcher).launch(python_and_java)
         
         for java_filename in java_files :
             os.remove(java_filename)
         for java_class_filename in java_class_filenames:
             os.remove(java_class_filename)
+        
+        sys.exit(test_result)
