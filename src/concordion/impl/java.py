@@ -11,10 +11,12 @@ import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.XmlRpcException;
 import org.concordion.integration.junit3.ConcordionTestCase;
+import org.concordion.api.%(expected)s;
 import java.lang.reflect.Array;
 import java.util.*;
 """
 class_declaration="""
+@%(expected)s
 public class %(name)s extends ConcordionTestCase{
 """
 attributes="""
@@ -66,8 +68,13 @@ class JavaClassGenerator:
         return result
     
     def generate(self, python_class):
-        return "".join([imports, 
-                        class_declaration%{"name":python_class.__name__}, 
+        expected = "ExpectedToPass"
+        try:
+            expected = python_class._pyconcordion_expected
+        except AttributeError:
+            pass
+        return "".join([imports%{"expected" : expected}, 
+                        class_declaration%{"name":python_class.__name__, "expected" : expected}, 
                         attributes, 
                         setup%self.configuration['port'],
                         "\n".join(self.generateMethods(python_class)), 

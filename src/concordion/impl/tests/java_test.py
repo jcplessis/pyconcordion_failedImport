@@ -24,9 +24,11 @@ import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.XmlRpcException;
 import org.concordion.integration.junit3.ConcordionTestCase;
+import org.concordion.api.ExpectedToPass;
 import java.lang.reflect.Array;
 import java.util.*;
 
+@ExpectedToPass
 public class MyPythonFile extends ConcordionTestCase{
 
     XmlRpcClient client = null;
@@ -126,6 +128,41 @@ class MyPythonFile:
         self.assertEquals("tmp/MyPythonFile.java", result[0])
         shutil.rmtree("tmp")
         
+    def test_can_generate_annotation_expected_to_fail(self):
+        "Class Generator - Can generate annotation ExpectedToFail"
+        _createFile("MyPythonFile.py", """
+from concordion.annotation import ExpectedToFail
+
+@ExpectedToFail
+class MyPythonFile:
+    pass
+""")
+        result = JavaClassGenerator().run(["MyPythonFile.py"])
+
+        self.assertTrue(file("MyPythonFile.java").read().find("""
+@ExpectedToFail
+""")>=0)
+        self.assertTrue(file("MyPythonFile.java").read().find("""
+import org.concordion.api.ExpectedToFail;
+""")>=0)
+        
+    def test_can_generate_annotation_unimplemented(self):
+        "Class Generator - Can generate annotation Unimplemented"
+        _createFile("MyPythonFile.py", """
+from concordion.annotation import Unimplemented
+
+@Unimplemented
+class MyPythonFile:
+    pass
+""")
+        result = JavaClassGenerator().run(["MyPythonFile.py"])
+
+        self.assertTrue(file("MyPythonFile.java").read().find("""
+@Unimplemented
+""")>=0)
+        self.assertTrue(file("MyPythonFile.java").read().find("""
+import org.concordion.api.Unimplemented;
+""")>=0)
     
         
         
