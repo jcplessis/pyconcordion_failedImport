@@ -214,7 +214,8 @@ class JavaTestLauncherTest(unittest.TestCase):
         classpath.expects(pmock.once()).removeDirectory(pmock.eq("polop"))
         executor.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput/polop -cp myclasspath junit.textui.TestRunner MyClass"), pmock.eq(True)).will(pmock.return_value(0))
         
-        JavaTestLauncher(config, classpath, executor).launch("polop/MyClass.class")
+        result = JavaTestLauncher(config, classpath, executor).launch("polop/MyClass.class")
+        self.assertEquals(0, result)
         
     def testAddsAndRemovesDirectoriesFromClasspath(self):
         "JavaTestLauncher - when launching a file it adds the directory to the classpath and removes it after"
@@ -230,8 +231,8 @@ class JavaTestLauncherTest(unittest.TestCase):
         
         JavaTestLauncher(mock, mock, mock).launch("polop/MyClass.class")
         
-    def testCanLaunchAndRaiseWhenFailureOccurs(self):
-        "JavaTestLauncher - can launch a file and raise an exception when compile fails"
+    def testCanLaunchAndReturnFailure(self):
+        "JavaTestLauncher - can launch a file and return a non zero code in case of failure"
         executor = pmock.Mock()
         config = pmock.Mock()
         classpath = pmock.Mock()
@@ -240,13 +241,10 @@ class JavaTestLauncherTest(unittest.TestCase):
         classpath.expects(pmock.once()).getClasspath().will(pmock.return_value(""))
         classpath.expects(pmock.once()).addDirectory(pmock.eq(""))
         classpath.expects(pmock.once()).removeDirectory(pmock.eq(""))
-
         executor.expects(pmock.once()).method("run").will(pmock.return_value(1))
-        try:
-            result = JavaTestLauncher(config, classpath, executor).launch("")
-            self.fail("Should have raised an exception")
-        except Exception, e:
-            self.assertEquals("Sorry, an exception occured in the test launching process", str(e))
+        result = JavaTestLauncher(config, classpath, executor).launch("")
+        self.assertEquals(1, result)
+
         
         
         
