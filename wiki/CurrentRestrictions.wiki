@@ -8,7 +8,6 @@ A few restrictions are placed on current version of !PyConcordion, due to lack o
 = Details =
 
   * All your test methods should return a value that is not `None`. This is due to some xml-rpc restriction.
-  * assertTrue as well as annotations are not supported (release 0.1 is based on Concordion 1.2.0) (this has been fixed on repository, release 0.2 should suppress this restriction)
   * You have to follow naming conventions (same as in Concordion itself) that are :
       * `MyPage.html` for you test specification
       * `MyPageTest.py` containing a class named `MyPageTest` for your fixture
