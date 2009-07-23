@@ -6,7 +6,7 @@ class JavaClassGeneratorTest(unittest.TestCase):
     
     def test_can_generate_for_an_empty_list_of_classes(self):
         "Class Generator - Can be run on an empty file list"
-        generator = JavaClassGenerator()
+        generator = JavaClassGenerator(".")
         self.assertEquals([], generator.run([]))
         
     def test_can_generate_for_a_single_simple_python_file(self):
@@ -15,7 +15,7 @@ class JavaClassGeneratorTest(unittest.TestCase):
 class MyPythonFile:
     pass
 """)
-        result = JavaClassGenerator().run(["MyPythonFile.py"])
+        result = JavaClassGenerator(".").run(["MyPythonFile.py"])
         self.assertEquals(1, len(result))
         self.assertEquals("MyPythonFile.java", result[0])
         self.assertEquals("""
@@ -50,7 +50,7 @@ class MyPythonFile2:
     def do_plop(self):
         pass
 """)
-        JavaClassGenerator().run(["MyPythonFile2.py"])
+        JavaClassGenerator(".").run(["MyPythonFile2.py"])
         self.assertTrue(file("MyPythonFile2.java").read().find("""
 public Object do_plop() throws XmlRpcException{
     Object result = this.client.execute("do_plop", new Object[]{});
@@ -75,7 +75,7 @@ class MyPythonFile2:
     def do_plop(self):
         local_variable = "polop"
 """)
-        JavaClassGenerator().run(["MyPythonFile2.py"])
+        JavaClassGenerator(".").run(["MyPythonFile2.py"])
         self.assertTrue(file("MyPythonFile2.java").read().find("""
 public Object do_plop() throws XmlRpcException{
     Object result = this.client.execute("do_plop", new Object[]{});
@@ -98,7 +98,7 @@ class MyPythonFile3:
     def do_plop(self, polop, pilip):
         pass
 """)
-        JavaClassGenerator().run(["MyPythonFile3.py"])
+        JavaClassGenerator(".").run(["MyPythonFile3.py"])
         self.assertTrue(file("MyPythonFile3.java").read().find("""
 public Object do_plop(String polop, String pilip) throws XmlRpcException{
     Object result = this.client.execute("do_plop", new Object[]{polop, pilip});
@@ -123,7 +123,7 @@ public Object do_plop(String polop, String pilip) throws XmlRpcException{
 class MyPythonFile:
     pass
 """)
-        result = JavaClassGenerator().run(["tmp/MyPythonFile.py"])
+        result = JavaClassGenerator("tmp/").run(["tmp/MyPythonFile.py"])
         self.assertEquals(1, len(result))
         self.assertEquals("tmp/MyPythonFile.java", result[0])
         shutil.rmtree("tmp")
@@ -137,7 +137,7 @@ from concordion.annotation import ExpectedToFail
 class MyPythonFile:
     pass
 """)
-        result = JavaClassGenerator().run(["MyPythonFile.py"])
+        result = JavaClassGenerator(".").run(["MyPythonFile.py"])
 
         self.assertTrue(file("MyPythonFile.java").read().find("""
 @ExpectedToFail
@@ -155,7 +155,7 @@ from concordion.annotation import Unimplemented
 class MyPythonFile:
     pass
 """)
-        result = JavaClassGenerator().run(["MyPythonFile.py"])
+        result = JavaClassGenerator(".").run(["MyPythonFile.py"])
 
         self.assertTrue(file("MyPythonFile.java").read().find("""
 @Unimplemented
@@ -164,7 +164,23 @@ class MyPythonFile:
 import org.concordion.api.Unimplemented;
 """)>=0)
     
-        
+    def test_can_generate_with_package_declaration(self):
+        "Class Generator - Can generate package declaration"
+        if not os.path.exists("tmp"):
+            os.mkdir("tmp")
+        if not os.path.exists("tmp/polop"):
+            os.mkdir("tmp/polop")
+        _createFile("tmp/polop/MyPythonFile.py", """
+class MyPythonFile:
+    pass
+""")
+        result = JavaClassGenerator(".").run(["tmp/polop/MyPythonFile.py"])
+        self.assertEquals(1, len(result))
+        self.assertEquals("tmp/polop/MyPythonFile.java", result[0])
+        self.assertTrue(file("tmp/polop/MyPythonFile.java").read().find("""
+package tmp.polop;
+""")>=0)
+        shutil.rmtree("tmp")
         
 class ClasspathTest(unittest.TestCase):
     
@@ -247,11 +263,11 @@ class JavaTestLauncherTest(unittest.TestCase):
         config.expects(pmock.once()).get(pmock.eq("java_command")).will(pmock.return_value("myJava"))
         config.expects(pmock.once()).get(pmock.eq("output_folder")).will(pmock.return_value("myOutput"))
         classpath.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath"))
-        classpath.expects(pmock.once()).addDirectory(pmock.eq("polop"))
-        classpath.expects(pmock.once()).removeDirectory(pmock.eq("polop"))
-        executor.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput/polop -cp myclasspath junit.textui.TestRunner MyClass"), pmock.eq(True)).will(pmock.return_value(0))
+        classpath.expects(pmock.once()).addDirectory(pmock.eq("."))
+        classpath.expects(pmock.once()).removeDirectory(pmock.eq("."))
+        executor.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput -cp myclasspath junit.textui.TestRunner polop.MyClass"), pmock.eq(True)).will(pmock.return_value(0))
         
-        result = JavaTestLauncher(config, classpath, executor).launch("polop/MyClass.class")
+        result = JavaTestLauncher(config, classpath, executor, ".").launch("polop/MyClass.class")
         self.assertEquals(0, result)
         
     def testAddsAndRemovesDirectoriesFromClasspath(self):
@@ -260,13 +276,13 @@ class JavaTestLauncherTest(unittest.TestCase):
         mock.expects(pmock.once()).get(pmock.eq("java_command")).will(pmock.return_value("myJava"))
         mock.expects(pmock.once()).get(pmock.eq("output_folder")).will(pmock.return_value("myOutput"))
         
-        mock.expects(pmock.once()).addDirectory(pmock.eq("polop")).id("add")
-        mock.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath;polop")).after("add").id("getPath")
-        mock.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput/polop -cp myclasspath;polop junit.textui.TestRunner MyClass"), pmock.eq(True)) \
+        mock.expects(pmock.once()).addDirectory(pmock.eq(".")).id("add")
+        mock.expects(pmock.once()).getClasspath().will(pmock.return_value("myclasspath;.")).after("add").id("getPath")
+        mock.expects(pmock.once()).run(pmock.eq("myJava -Dconcordion.output.dir=myOutput -cp myclasspath;. junit.textui.TestRunner polop.MyClass"), pmock.eq(True)) \
             .will(pmock.return_value(0)).id("exec").after("getPath")
-        mock.expects(pmock.once()).removeDirectory(pmock.eq("polop")).after("exec")
+        mock.expects(pmock.once()).removeDirectory(pmock.eq(".")).after("exec")
         
-        JavaTestLauncher(mock, mock, mock).launch("polop/MyClass.class")
+        JavaTestLauncher(mock, mock, mock, ".").launch("polop/MyClass.class")
         
     def testCanLaunchAndReturnFailure(self):
         "JavaTestLauncher - can launch a file and return a non zero code in case of failure"
@@ -279,7 +295,7 @@ class JavaTestLauncherTest(unittest.TestCase):
         classpath.expects(pmock.once()).addDirectory(pmock.eq(""))
         classpath.expects(pmock.once()).removeDirectory(pmock.eq(""))
         executor.expects(pmock.once()).method("run").will(pmock.return_value(1))
-        result = JavaTestLauncher(config, classpath, executor).launch("")
+        result = JavaTestLauncher(config, classpath, executor, "").launch("")
         self.assertEquals(1, result)
 
         
