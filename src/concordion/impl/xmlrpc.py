@@ -24,7 +24,10 @@ class XmlRpcServer:
 class XMLRPCServerThread:
     def __init__(self, instance, port):
         self.server = SimpleXMLRPCServer(("localhost", port), logRequests=False, allow_none=True)
-        self.server.register_instance(instance)
+        for key in dir(instance):
+            attr = getattr(instance, key)
+            if isinstance(attr, self.__init__.__class__):
+                self.server.register_function(attr, instance.__class__.__name__ + "_" + attr.__name__)
         
     def __call__(self):
         self.server.serve_forever()
