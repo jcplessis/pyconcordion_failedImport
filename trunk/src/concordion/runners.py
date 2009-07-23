@@ -15,7 +15,7 @@ class FolderRunner:
         lib_path = os.path.join(installation_path, "lib")
         classpath = Classpath(lib_path)
         
-        java_files = JavaClassGenerator().run(python_files)
+        java_files = JavaClassGenerator(config).run(python_files)
         
         executor = CommandExecutor()
         
