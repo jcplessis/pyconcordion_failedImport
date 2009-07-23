@@ -53,7 +53,7 @@ class MyPythonFile2:
         JavaClassGenerator(".").run(["MyPythonFile2.py"])
         self.assertTrue(file("MyPythonFile2.java").read().find("""
 public Object do_plop() throws XmlRpcException{
-    Object result = this.client.execute("do_plop", new Object[]{});
+    Object result = this.client.execute("MyPythonFile2_do_plop", new Object[]{});
     if(result.getClass().isArray()){
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < Array.getLength(result); i++){
@@ -78,7 +78,7 @@ class MyPythonFile2:
         JavaClassGenerator(".").run(["MyPythonFile2.py"])
         self.assertTrue(file("MyPythonFile2.java").read().find("""
 public Object do_plop() throws XmlRpcException{
-    Object result = this.client.execute("do_plop", new Object[]{});
+    Object result = this.client.execute("MyPythonFile2_do_plop", new Object[]{});
     if(result.getClass().isArray()){
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < Array.getLength(result); i++){
@@ -101,7 +101,7 @@ class MyPythonFile3:
         JavaClassGenerator(".").run(["MyPythonFile3.py"])
         self.assertTrue(file("MyPythonFile3.java").read().find("""
 public Object do_plop(String polop, String pilip) throws XmlRpcException{
-    Object result = this.client.execute("do_plop", new Object[]{polop, pilip});
+    Object result = this.client.execute("MyPythonFile3_do_plop", new Object[]{polop, pilip});
     if(result.getClass().isArray()){
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < Array.getLength(result); i++){

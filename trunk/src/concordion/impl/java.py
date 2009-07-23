@@ -35,7 +35,7 @@ footer="""
 
 method_template = """
 public Object %(name)s(%(args_declaration)s) throws XmlRpcException{
-    Object result = this.client.execute("%(name)s", new Object[]{%(args_list)s});
+    Object result = this.client.execute("%(class_name)s_%(name)s", new Object[]{%(args_list)s});
     if(result.getClass().isArray()){
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < Array.getLength(result); i++){
@@ -98,7 +98,7 @@ class JavaClassGenerator:
                 arguments = method.func_code.co_varnames[:method.func_code.co_argcount]
                 arguments_list=", ".join(arguments[1:])
                 arguments_declaration=", ".join(["String " + x for x in arguments[1:]])
-                methods.append(method_template%{"name":method_name, "args_declaration":arguments_declaration, "args_list":arguments_list})
+                methods.append(method_template%{"name":method_name, "class_name":python_class.__name__, "args_declaration":arguments_declaration, "args_list":arguments_list})
         return methods
     
 class Classpath:

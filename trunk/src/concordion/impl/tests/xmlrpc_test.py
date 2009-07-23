@@ -19,7 +19,7 @@ class XmlRpcServerTest(unittest.TestCase):
     def assertNotAvailable(self):
         server = xmlrpclib.ServerProxy("http://localhost:8000")
         try:
-            server.echo("polop")
+            server.xmlrpc_test_echo("polop")
             self.fail("Should have thrown exception")
         except Exception, (code, message):
             self.assertEquals('Connection refused', message)
@@ -27,7 +27,7 @@ class XmlRpcServerTest(unittest.TestCase):
     def assertAvailable(self): 
         server = xmlrpclib.ServerProxy("http://localhost:8000")
         try:
-            server.echo("polop")
+            server.xmlrpc_test_echo("polop")
         except Exception, value:
             self.fail("Shouldn't have thrown exception : " + repr(value))
 
