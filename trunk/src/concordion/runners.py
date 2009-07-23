@@ -21,13 +21,14 @@ class FolderRunner:
         
         java_class_filenames = JavaFileCompiler(config, classpath, executor).compile(java_files)
         
-        xmlRpcServer = XmlRpcServer(config)
+        xmlRpcServer = XmlRpcServer(config, python_files)
+        xmlRpcServer.launch()
         java_launcher = JavaTestLauncher(config, classpath, executor, directory)
-        python_and_java = []
-        for i in range(len(python_files)):
-            python_and_java.append((python_files[i], java_class_filenames[i]))
+        test_result = 0
+        for java_class in java_class_filenames:
+            test_result += java_launcher.launch(java_class)
         
-        test_result = TestLauncher(xmlRpcServer, java_launcher).launch(python_and_java)
+        xmlRpcServer.stop()
         
         for java_filename in java_files :
             os.remove(java_filename)
