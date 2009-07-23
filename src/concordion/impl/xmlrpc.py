@@ -2,16 +2,20 @@ import os, threading, sys
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 class XmlRpcServer:
-    def __init__(self, configuration):
+    def __init__(self, configuration, files):
         self.configuration = configuration
+        self.files = files
     
-    def launch(self, file):
-        module_name = os.path.basename(file).replace(".pyc", "").replace(".py", "")
-        dir = os.path.dirname(file)
-        sys.path.append(dir)
-        exec "import " + module_name
-        exec "instance=" + module_name + "." + module_name + "()"
-        self.server = XMLRPCServerThread(instance, int(self.configuration.get("server_port")))
+    def launch(self):
+        self.server = XMLRPCServerThread(int(self.configuration.get("server_port")))
+        for file in self.files:
+            module_name = os.path.basename(file).replace(".pyc", "").replace(".py", "")
+            dir = os.path.dirname(file)
+            sys.path.append(dir)
+            exec "import " + module_name
+            exec "instance=" + module_name + "." + module_name + "()"
+            self.server.add_instance(instance)
+
         self.thread = threading.Thread(target=self.server)
         self.thread.setDaemon(True)
         self.thread.start()
@@ -22,8 +26,10 @@ class XmlRpcServer:
 
 
 class XMLRPCServerThread:
-    def __init__(self, instance, port):
+    def __init__(self, port):
         self.server = SimpleXMLRPCServer(("localhost", port), logRequests=False, allow_none=True)
+    
+    def add_instance(self, instance):
         for key in dir(instance):
             attr = getattr(instance, key)
             if isinstance(attr, self.__init__.__class__):

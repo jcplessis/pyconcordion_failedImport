@@ -9,9 +9,9 @@ class XmlRpcServerTest(unittest.TestCase):
         "XmlRpcServer - can be launched and stopped"
         config = pmock.Mock()
         config.expects(pmock.once()).get(pmock.eq("server_port")).will(pmock.return_value("8000"))
-        server = XmlRpcServer(config)
+        server = XmlRpcServer(config, [__file__])
         self.assertNotAvailable()
-        server.launch(__file__)
+        server.launch()
         self.assertAvailable()
         server.stop()
         self.assertNotAvailable()
