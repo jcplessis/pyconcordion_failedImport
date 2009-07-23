@@ -2,7 +2,7 @@ import os
 import glob
 
 package = """
-package %s
+package %s;
 """
 
 imports="""
@@ -51,7 +51,7 @@ class JavaClassGenerator:
     
     def __init__(self, configuration=None):
         if not configuration:
-            configuration = {'port':1337}
+            configuration = {'server_port':1337}
         self.configuration = configuration
     
     def run(self, python_files):
@@ -76,7 +76,7 @@ class JavaClassGenerator:
         return "".join([imports%{"expected" : expected}, 
                         class_declaration%{"name":python_class.__name__, "expected" : expected}, 
                         attributes, 
-                        setup%self.configuration['port'],
+                        setup%self.configuration.get('server_port'),
                         "\n".join(self.generateMethods(python_class)), 
                         footer])
         
