@@ -15,14 +15,14 @@ class FolderRunner:
         lib_path = os.path.join(installation_path, "lib")
         classpath = Classpath(lib_path)
         
-        java_files = JavaClassGenerator(config).run(python_files)
+        java_files = JavaClassGenerator(directory, config).run(python_files)
         
         executor = CommandExecutor()
         
         java_class_filenames = JavaFileCompiler(config, classpath, executor).compile(java_files)
         
         xmlRpcServer = XmlRpcServer(config)
-        java_launcher = JavaTestLauncher(config, classpath, executor)
+        java_launcher = JavaTestLauncher(config, classpath, executor, directory)
         python_and_java = []
         for i in range(len(python_files)):
             python_and_java.append((python_files[i], java_class_filenames[i]))

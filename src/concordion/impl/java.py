@@ -49,10 +49,11 @@ public Object %(name)s(%(args_declaration)s) throws XmlRpcException{
 
 class JavaClassGenerator:
     
-    def __init__(self, configuration=None):
+    def __init__(self, root_dir, configuration=None):
         if not configuration:
             configuration = {'server_port':1337}
         self.configuration = configuration
+        self.root_dir = root_dir
     
     def run(self, python_files):
         result = []
@@ -62,24 +63,33 @@ class JavaClassGenerator:
             execfile(python_file, python_module)
             python_class_name = os.path.split(python_file)[1].replace(".py", "");
             python_class = python_module[python_class_name]
-            java_content = self.generate(python_class)
+            java_content = self.generate(python_class, python_file)
             file(java_file, "w").write(java_content)
             result.append(python_file.replace(".py", ".java"))
         return result
     
-    def generate(self, python_class):
+    def generate(self, python_class, python_file):
         expected = "ExpectedToPass"
         try:
             expected = python_class._pyconcordion_expected
         except AttributeError:
             pass
-        return "".join([imports%{"expected" : expected}, 
+        return "".join([self.generate_package(python_file),
+                        imports%{"expected" : expected}, 
                         class_declaration%{"name":python_class.__name__, "expected" : expected}, 
                         attributes, 
                         setup%self.configuration.get('server_port'),
                         "\n".join(self.generateMethods(python_class)), 
                         footer])
-        
+    
+    def generate_package(self, python_file):
+        file_from_root = os.path.abspath(python_file)[len(os.path.abspath(self.root_dir))+1:]
+        file_package = os.path.split(file_from_root)[0]
+        if file_package == "":
+            return ""
+        else:
+            return package%file_package.replace(os.sep, ".")
+    
     def generateMethods(self, python_class):
         methods = []
         for method_name in dir(python_class):
@@ -129,21 +139,29 @@ class JavaFileCompiler:
         return map(modifyExtension, javaFiles)
         
 class JavaTestLauncher:
-    def __init__(self, config, classpath, executor):
+    def __init__(self, config, classpath, executor, root_dir):
         self.configuration = config
         self.classpath = classpath
         self.executor = executor
+        self.root_dir = root_dir
         
     def launch(self, classFile):
-        className = os.path.basename(classFile).replace(".class", "")
-        directory = os.path.split(classFile)[0]
-        self.classpath.addDirectory(directory)
+        (directory, name) = os.path.split(classFile)
+        className = name.replace(".class", "")
+        package = os.path.abspath(directory)[len(os.path.abspath(self.root_dir))+1:].replace(os.sep, ".")
+        class_full_path = None
+        if package == "":
+            class_full_path = className
+        else:
+            class_full_path = package + "." + className
+
+        self.classpath.addDirectory(self.root_dir)
         command = " ".join([self.configuration.get('java_command'),
-                "-Dconcordion.output.dir="+ os.path.join(self.configuration.get('output_folder'), directory),
+                "-Dconcordion.output.dir="+ self.configuration.get('output_folder'),
                 "-cp",
                 self.classpath.getClasspath(),
                 "junit.textui.TestRunner",
-                className])
+                class_full_path])
         execution_result = self.executor.run(command, True)
-        self.classpath.removeDirectory(directory)
+        self.classpath.removeDirectory(self.root_dir)
         return execution_result
