@@ -46,7 +46,22 @@ public Object %(name)s(%(args_declaration)s) throws XmlRpcException{
     return result;
 }"""
 
+suite_template = """import junit.framework.Test;
+import junit.framework.TestSuite;
 
+
+public class Suite {
+    public static Test suite(){
+        TestSuite suite = new TestSuite();
+        suite.setName("pyConcordion test suite");
+%(tests)s
+        return suite;
+    }
+}
+"""
+
+add_test_template = '        suite.addTest(new TestSuite(%(class_full_path)s.class));'
+        
 class JavaClassGenerator:
     
     def __init__(self, root_dir, configuration=None):
@@ -67,6 +82,16 @@ class JavaClassGenerator:
             file(java_file, "w").write(java_content)
             result.append(python_file.replace(".py", ".java"))
         return result
+    
+    def suite(self, java_files):
+        add_tests = []
+        for file in java_files:
+            file_from_root = os.path.abspath(file)[len(os.path.abspath(self.root_dir))+1:]
+            full_path = file_from_root.replace('.java', '').replace(os.sep, '.')
+            add_tests.append(add_test_template%{"class_full_path":full_path})
+        suite_file = os.path.join(self.root_dir, "Suite.java")
+        open(suite_file, "w").write(suite_template%{"tests" : "\n".join(add_tests)})
+        return suite_file
     
     def generate(self, python_class, python_file):
         expected = "ExpectedToPass"

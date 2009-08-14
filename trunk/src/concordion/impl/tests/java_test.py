@@ -182,6 +182,30 @@ package tmp.polop;
 """)>=0)
         shutil.rmtree("tmp")
         
+        
+    def test_can_generate_testsuite(self):
+        "Class Generator - Can generate test suite"
+        if not os.path.exists("tmp"):
+            os.mkdir("tmp")
+        expected = """import junit.framework.Test;
+import junit.framework.TestSuite;
+
+
+public class Suite {
+    public static Test suite(){
+        TestSuite suite = new TestSuite();
+        suite.setName("pyConcordion test suite");
+        suite.addTest(new TestSuite(polop.MyPythonFile.class));
+        suite.addTest(new TestSuite(polop.OtherPythonFile.class));
+        return suite;
+    }
+}
+"""
+        result = JavaClassGenerator("tmp").suite(["tmp/polop/MyPythonFile.java", "tmp/polop/OtherPythonFile.java"])
+        self.assertEquals("tmp/Suite.java", result)
+        self.assertEquals(expected, file(result).read())
+        shutil.rmtree("tmp")
+        
 class ClasspathTest(unittest.TestCase):
     
     def setUp(self):
