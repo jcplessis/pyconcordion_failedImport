@@ -3,7 +3,6 @@ from impl.java import JavaClassGenerator, Classpath, JavaFileCompiler, JavaTestL
 from impl.configuration import FileConfiguration
 from impl.executors import CommandExecutor
 from impl.xmlrpc import XmlRpcServer
-from impl.launcher import TestLauncher
 from impl.files_finders import FolderTestFinder
 
 
@@ -15,7 +14,10 @@ class FolderRunner:
         lib_path = os.path.join(installation_path, "lib")
         classpath = Classpath(lib_path)
         
-        java_files = JavaClassGenerator(directory, config).run(python_files)
+        class_generator = JavaClassGenerator(directory, config)
+        java_files = class_generator.run(python_files)
+        java_suite = class_generator.suite(java_files)
+        java_files.append(java_suite)
         
         executor = CommandExecutor()
         
@@ -23,11 +25,8 @@ class FolderRunner:
         
         xmlRpcServer = XmlRpcServer(config, python_files)
         xmlRpcServer.launch()
-        java_launcher = JavaTestLauncher(config, classpath, executor, directory)
-        test_result = 0
-        for java_class in java_class_filenames:
-            test_result += java_launcher.launch(java_class)
-        
+       
+        test_result = JavaTestLauncher(config, classpath, executor, directory).launch(java_suite.replace('.java', '.class'))
         xmlRpcServer.stop()
         
         for java_filename in java_files :
