@@ -20,6 +20,13 @@ class MyPythonFile:
         self.assertEquals("MyPythonFile.java", result[0])
         self.assertEquals("""
 import java.net.*;
+import org.apache.ws.commons.util.NamespaceContextImpl;
+import org.apache.xmlrpc.common.TypeFactoryImpl;
+import org.apache.xmlrpc.common.XmlRpcController;
+import org.apache.xmlrpc.common.XmlRpcStreamConfig;
+import org.apache.xmlrpc.parser.NullParser;
+import org.apache.xmlrpc.parser.TypeParser;
+import org.apache.xmlrpc.serializer.NullSerializer;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.XmlRpcException;
@@ -37,7 +44,26 @@ public class MyPythonFile extends ConcordionTestCase{
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(new URL("http://localhost:1337/"));
         this.client = new XmlRpcClient();
+        this.client.setTypeFactory(new MyTypeFactory(this.client));
         this.client.setConfig(config);
+    }
+
+    class MyTypeFactory extends TypeFactoryImpl {
+    
+        public MyTypeFactory(XmlRpcController pController) {
+            super(pController);
+        }
+    
+        @Override
+        public TypeParser getParser(XmlRpcStreamConfig pConfig,
+          NamespaceContextImpl pContext, String pURI, String pLocalName) {
+    
+            if ("".equals(pURI) && NullSerializer.NIL_TAG.equals(pLocalName)) {
+                return new NullParser();
+            } else {
+                return super.getParser(pConfig, pContext, pURI, pLocalName);
+            }
+        }
     }
 }""", file(result[0]).read())
         os.remove("MyPythonFile.py")
@@ -54,7 +80,7 @@ class MyPythonFile2:
         self.assertTrue(file("MyPythonFile2.java").read().find("""
 public Object do_plop() throws XmlRpcException{
     Object result = this.client.execute("MyPythonFile2_do_plop", new Object[]{});
-    if(result.getClass().isArray()){
+    if(result != null && result.getClass().isArray()){
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < Array.getLength(result); i++){
             list.add(Array.get(result, i));
@@ -79,15 +105,7 @@ class MyPythonFile2:
         self.assertTrue(file("MyPythonFile2.java").read().find("""
 public Object do_plop() throws XmlRpcException{
     Object result = this.client.execute("MyPythonFile2_do_plop", new Object[]{});
-    if(result.getClass().isArray()){
-        List<Object> list = new ArrayList<Object>();
-        for(int i = 0; i < Array.getLength(result); i++){
-            list.add(Array.get(result, i));
-        }
-        return list;
-    }
-    return result;
-}""")>=0)
+""")>=0)
         os.remove("MyPythonFile2.py")
         os.remove("MyPythonFile2.java")
 
@@ -102,15 +120,7 @@ class MyPythonFile3:
         self.assertTrue(file("MyPythonFile3.java").read().find("""
 public Object do_plop(String polop, String pilip) throws XmlRpcException{
     Object result = this.client.execute("MyPythonFile3_do_plop", new Object[]{polop, pilip});
-    if(result.getClass().isArray()){
-        List<Object> list = new ArrayList<Object>();
-        for(int i = 0; i < Array.getLength(result); i++){
-            list.add(Array.get(result, i));
-        }
-        return list;
-    }
-    return result;
-}""")>=0)
+""")>=0)
         os.remove("MyPythonFile3.py")
         os.remove("MyPythonFile3.java")
         

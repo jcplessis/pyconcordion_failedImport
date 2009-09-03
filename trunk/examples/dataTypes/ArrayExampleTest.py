@@ -5,7 +5,6 @@ class ArrayExampleTest:
 
 	def addUser(self, user):
 		self.users.append(user)
-		return "ok"
 	
 	def getUsersContaining(self, text):
 		res = []
