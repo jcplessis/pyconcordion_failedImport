@@ -33,6 +33,9 @@ class FolderRunner:
         for java_filename in java_files :
             os.remove(java_filename)
         for java_class_filename in java_class_filenames:
+            internal_class = java_class_filename.replace(".class", "$MyTypeFactory.class")
+            if os.path.exists(internal_class):
+                os.remove(internal_class)
             os.remove(java_class_filename)
         
         sys.exit(test_result)

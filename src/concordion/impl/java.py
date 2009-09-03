@@ -7,6 +7,13 @@ package %s;
 
 imports="""
 import java.net.*;
+import org.apache.ws.commons.util.NamespaceContextImpl;
+import org.apache.xmlrpc.common.TypeFactoryImpl;
+import org.apache.xmlrpc.common.XmlRpcController;
+import org.apache.xmlrpc.common.XmlRpcStreamConfig;
+import org.apache.xmlrpc.parser.NullParser;
+import org.apache.xmlrpc.parser.TypeParser;
+import org.apache.xmlrpc.serializer.NullSerializer;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.XmlRpcException;
@@ -27,16 +34,35 @@ setup="""
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(new URL("http://localhost:%s/"));
         this.client = new XmlRpcClient();
+        this.client.setTypeFactory(new MyTypeFactory(this.client));
         this.client.setConfig(config);
     }"""
 
 footer="""
+
+    class MyTypeFactory extends TypeFactoryImpl {
+    
+        public MyTypeFactory(XmlRpcController pController) {
+            super(pController);
+        }
+    
+        @Override
+        public TypeParser getParser(XmlRpcStreamConfig pConfig,
+          NamespaceContextImpl pContext, String pURI, String pLocalName) {
+    
+            if ("".equals(pURI) && NullSerializer.NIL_TAG.equals(pLocalName)) {
+                return new NullParser();
+            } else {
+                return super.getParser(pConfig, pContext, pURI, pLocalName);
+            }
+        }
+    }
 }"""
 
 method_template = """
 public Object %(name)s(%(args_declaration)s) throws XmlRpcException{
     Object result = this.client.execute("%(class_name)s_%(name)s", new Object[]{%(args_list)s});
-    if(result.getClass().isArray()){
+    if(result != null && result.getClass().isArray()){
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < Array.getLength(result); i++){
             list.add(Array.get(result, i));
