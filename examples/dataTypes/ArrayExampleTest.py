@@ -1,10 +1,8 @@
 import re
 
 class ArrayExampleTest:
-	
-	def __init__(self):
-		self.users = []
-	
+	users = []
+
 	def addUser(self, user):
 		self.users.append(user)
 		return "ok"

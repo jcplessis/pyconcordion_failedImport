@@ -182,6 +182,21 @@ package tmp.polop;
 """)>=0)
         shutil.rmtree("tmp")
         
+    def test_can_generate_when_python_class_got_attributes(self):
+        "Class Generator - Can generate when python class got attributes"
+        _createFile("MyPythonFile.py", """
+class MyPythonFile:
+    attribute = []
+    
+    def polop(self):
+        pass
+""")
+        result = JavaClassGenerator(".").run(["MyPythonFile.py"])
+        self.assertEquals(1, len(result))
+        self.assertEquals("MyPythonFile.java", result[0])
+        os.remove("MyPythonFile.py")
+        os.remove("MyPythonFile.java")
+        
         
     def test_can_generate_testsuite(self):
         "Class Generator - Can generate test suite"
