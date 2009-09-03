@@ -120,10 +120,11 @@ class JavaClassGenerator:
         for method_name in dir(python_class):
             if not method_name.startswith("_"):
                 method = getattr(python_class, method_name)
-                arguments = method.func_code.co_varnames[:method.func_code.co_argcount]
-                arguments_list=", ".join(arguments[1:])
-                arguments_declaration=", ".join(["String " + x for x in arguments[1:]])
-                methods.append(method_template%{"name":method_name, "class_name":python_class.__name__, "args_declaration":arguments_declaration, "args_list":arguments_list})
+                if isinstance(method, type(self.generateMethods)):
+                    arguments = method.func_code.co_varnames[:method.func_code.co_argcount]
+                    arguments_list=", ".join(arguments[1:])
+                    arguments_declaration=", ".join(["String " + x for x in arguments[1:]])
+                    methods.append(method_template%{"name":method_name, "class_name":python_class.__name__, "args_declaration":arguments_declaration, "args_list":arguments_list})
         return methods
     
 class Classpath:
