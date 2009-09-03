@@ -21,8 +21,11 @@ class XmlRpcServer:
         self.thread.start()
     
     def stop(self):
-        self.server.stop()
-        self.thread.join()
+        try:
+            self.server.stop()
+            self.thread.join()
+        except Exception, e:
+            pass # In python 2.5 we can't stop the xmlrpc server
 
 
 class XMLRPCServerThread:
