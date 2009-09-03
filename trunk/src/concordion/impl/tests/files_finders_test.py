@@ -51,7 +51,16 @@ class FolderRunnerTest(unittest.TestCase):
         py_files = runner.find_files()
         self.assertEquals(1, len(py_files))
         self.assertEquals("example_folder/polop_folder/fileTest.py", py_files[0])    
-        
+    
+    def test_only_finds_test_classes(self):
+        "Folder Finder - only finds test classes (*Test.py)"
+        self._create_file("fileTest.py")
+        self._create_file("not_interesting.py")
+        runner = FolderTestFinder("./example_folder")
+        py_files = runner.find_files()
+        self.assertEquals(1, len(py_files))
+        self.assertEquals("./example_folder/fileTest.py", py_files[0])
+    
     def _create_file(self, filepath):
         directory, file = os.path.split(filepath)
         parent_folder = os.path.join(self.example_folder, directory)

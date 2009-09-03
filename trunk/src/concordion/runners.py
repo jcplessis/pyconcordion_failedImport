@@ -8,6 +8,7 @@ from impl.files_finders import FolderTestFinder
 
 class FolderRunner:
     def run(self, directory):
+        sys.path.append(directory)
         python_files = FolderTestFinder(directory).find_files()
         installation_path = os.path.split(__file__)[0]
         config = FileConfiguration(os.path.join(installation_path, "config.ini"))

@@ -5,7 +5,7 @@ class FolderTestFinder:
         self.folder = folder
     
     def find_files(self):
-        python_matcher = re.compile("\.py$")
+        python_matcher = re.compile("Test\.py$")
         hidden_folder_matcher = re.compile("\.[^/]")
         result = []
         for root, dirs, files in os.walk(self.folder):
