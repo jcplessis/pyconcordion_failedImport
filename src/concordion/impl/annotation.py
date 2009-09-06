@@ -10,3 +10,11 @@ def Unimplemented(clazz):
     clazz._pyconcordion_expected = 'Unimplemented'
     return clazz
 
+class ExpectedToFailClass:
+    _pyconcordion_expected = 'ExpectedToFail'
+
+class ExpectedToPassClass:
+    _pyconcordion_expected = 'ExpectedToPass'
+    
+class UnimplementedClass:
+    _pyconcordion_expected = 'Unimplemented'   
