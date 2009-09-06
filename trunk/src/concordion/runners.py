@@ -1,17 +1,20 @@
 import os, sys
 from impl.java import JavaClassGenerator, Classpath, JavaFileCompiler, JavaTestLauncher
-from impl.configuration import FileConfiguration
+from impl.configuration import FileConfiguration, HierarchicalConfiguration, DictionnaryConfiguration
 from impl.executors import CommandExecutor
 from impl.xmlrpc import XmlRpcServer
 from impl.files_finders import FolderTestFinder
 
 
 class FolderRunner:
-    def run(self, directory):
+    def run(self, directory, options = {}):
         sys.path.append(directory)
         python_files = FolderTestFinder(directory).find_files()
         installation_path = os.path.split(__file__)[0]
-        config = FileConfiguration(os.path.join(installation_path, "config.ini"))
+        config = HierarchicalConfiguration([
+            DictionnaryConfiguration(options),
+            FileConfiguration(os.path.join(installation_path, "config.ini")),
+        ])
         lib_path = os.path.join(installation_path, "lib")
         classpath = Classpath(lib_path)
         
