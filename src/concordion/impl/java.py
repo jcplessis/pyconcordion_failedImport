@@ -29,10 +29,10 @@ public class %(name)s extends ConcordionTestCase{
 attributes="""
     XmlRpcClient client = null;
 """
-setup="""
-    public void setUp() throws MalformedURLException{
+constructor="""
+    public %(class_name)s() throws MalformedURLException{
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-        config.setServerURL(new URL("http://localhost:%s/"));
+        config.setServerURL(new URL("http://localhost:%(port)s/"));
         this.client = new XmlRpcClient();
         this.client.setTypeFactory(new MyTypeFactory(this.client));
         this.client.setConfig(config);
@@ -72,6 +72,11 @@ public Object %(name)s(%(args_declaration)s) throws XmlRpcException{
     return result;
 }"""
 
+void_method_template = """
+public void %(name)s() throws XmlRpcException{
+    this.client.execute("%(class_name)s_%(name)s", new Object[]{});
+}"""
+
 suite_template = """import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -87,7 +92,9 @@ public class Suite {
 """
 
 add_test_template = '        suite.addTest(new TestSuite(%(class_full_path)s.class));'
-        
+
+void_methods = ["setUp", "tearDown"]
+
 class JavaClassGenerator:
     
     def __init__(self, root_dir, configuration=None):
@@ -129,7 +136,7 @@ class JavaClassGenerator:
                         imports%{"expected" : expected}, 
                         class_declaration%{"name":python_class.__name__, "expected" : expected}, 
                         attributes, 
-                        setup%self.configuration.get('server_port'),
+                        constructor%{"class_name":python_class.__name__, "port":self.configuration.get('server_port')},
                         "\n".join(self.generateMethods(python_class)), 
                         footer])
     
@@ -150,7 +157,10 @@ class JavaClassGenerator:
                     arguments = method.func_code.co_varnames[:method.func_code.co_argcount]
                     arguments_list=", ".join(arguments[1:])
                     arguments_declaration=", ".join(["String " + x for x in arguments[1:]])
-                    methods.append(method_template%{"name":method_name, "class_name":python_class.__name__, "args_declaration":arguments_declaration, "args_list":arguments_list})
+                    if method_name in void_methods:
+                        methods.append(void_method_template%{"name":method_name, "class_name":python_class.__name__})
+                    else:
+                        methods.append(method_template%{"name":method_name, "class_name":python_class.__name__, "args_declaration":arguments_declaration, "args_list":arguments_list})
         return methods
     
 class Classpath:
