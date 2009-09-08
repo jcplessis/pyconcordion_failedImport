@@ -40,7 +40,7 @@ public class MyPythonFile extends ConcordionTestCase{
 
     XmlRpcClient client = null;
 
-    public void setUp() throws MalformedURLException{
+    public MyPythonFile() throws MalformedURLException{
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(new URL("http://localhost:1337/"));
         this.client = new XmlRpcClient();
@@ -206,7 +206,27 @@ class MyPythonFile:
         self.assertEquals("MyPythonFile.java", result[0])
         os.remove("MyPythonFile.py")
         os.remove("MyPythonFile.java")
-        
+    
+    def test_can_generate_java_method_for_setUp_and_tearDown(self):
+        "Class Generator - Can generate for setUp and tearDown"
+        _createFile("MyPythonFile2.py", """
+class MyPythonFile2:
+    def setUp(self):
+        pass
+    def tearDown(self):
+        pass
+""")
+        JavaClassGenerator(".").run(["MyPythonFile2.py"])
+        self.assertTrue(file("MyPythonFile2.java").read().find("""
+public void setUp() throws XmlRpcException{
+    this.client.execute("MyPythonFile2_setUp", new Object[]{});
+}""")>=0)
+        self.assertTrue(file("MyPythonFile2.java").read().find("""
+public void tearDown() throws XmlRpcException{
+    this.client.execute("MyPythonFile2_tearDown", new Object[]{});
+}""")>=0)
+        os.remove("MyPythonFile2.py")
+        os.remove("MyPythonFile2.java")
         
     def test_can_generate_testsuite(self):
         "Class Generator - Can generate test suite"
