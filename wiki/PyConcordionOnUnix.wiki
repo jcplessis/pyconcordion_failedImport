@@ -1,0 +1,23 @@
+#summary How to work with pyConcordion under unix systems
+#labels Linux
+
+To use _pyConcordion_ under unix :
+   * Download the latest version, extract and run _python setup.py install_ from extract directory
+   * If java and javac are not in your normal PATH either :
+       * edit your PATH environment variable 
+       * or edit configuration file _/usr/local/lib/python2.6/dist-packages/concordion/config.ini_ to set the command line to use.
+   * From the directory containing your tests run the following command _concordion_folder_runner ._
+   * The command should output something like :
+{{{
+./tmp/pyConcordion/./my.html
+Successes: 1, Failures: 0
+
+
+Time: 0,813
+
+OK (1 test)
+}}}
+   * Your executed test files are available under _/tmp/pyConcordion_ by default.
+   * To change output directory either :
+      * modify _/usr/local/lib/python2.6/dist-packages/concordion/config.ini_ 
+      * or use the -o option (_concordion_folder_runner -o /home/jcplessis/myResulFolder ._)
