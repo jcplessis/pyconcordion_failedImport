@@ -1,0 +1,23 @@
+#summary How to work with pyConcordion under Microsoft Windows
+#labels Windows
+
+To use _pyConcordion_ under windows :
+   * Download the latest version, unzip and run _python setup.py install_ from extract directory
+   * If java and javac are not in your normal PATH either :
+       * edit your PATH environment variable 
+       * or edit configuration file _C:\Python26\Lib\site-packages\concordion\config.ini_ to set the command line to use.
+   * From the directory containing your tests run the following command _python C:\Python26\Scripts\concordion_folder_runner ._
+   * The command should output something like :
+{{{
+.C:\tmp\pyConcordion\.\my.html
+Successes: 1, Failures: 0
+
+
+Time: 0,813
+
+OK (1 test)
+}}}
+   * Your executed test files are available under _C:\tmp\pyConcordion_ by default.
+   * To change output directory either :
+      * modify _C:\Python26\Lib\site-packages\concordion\config.ini_ 
+      * or use the -o option (_python C:\Python26\Scripts\concordion_folder_runner -o C:\Temp\myResulFolder ._)
