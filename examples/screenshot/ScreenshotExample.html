@@ -1,0 +1,27 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion"
+	xmlns:ext="urn:concordion-extensions:2010"
+>
+<body>
+
+    <h1>Concordion extensions integration</h1>
+
+    <p>
+       <code>pyConcordion</code> allows use of <code>concordion-extensions</code>
+    </p>
+
+    <div class="example">
+
+        <h3>Example : Screenshot </h3>
+
+		<p>Let's include a screenshot</p>
+		<div ext:screenshot=""/>
+
+        <h3>Example : Embed HTML </h3>
+
+		<p>Let's include some HTML</p>
+		<span ext:embed="methodThatReturnsHtml()"/>
+    </div>
+
+
+</body>
+</html>

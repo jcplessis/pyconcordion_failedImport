@@ -5,7 +5,7 @@ package = """
 package %s;
 """
 
-imports="""
+imports = """
 import java.net.*;
 import org.apache.ws.commons.util.NamespaceContextImpl;
 import org.apache.xmlrpc.common.TypeFactoryImpl;
@@ -20,25 +20,27 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.concordion.integration.junit3.ConcordionTestCase;
 import org.concordion.api.%(expected)s;
 import java.lang.reflect.Array;
+import java.lang.System;
 import java.util.*;
 """
-class_declaration="""
+class_declaration = """
 @%(expected)s
 public class %(name)s extends ConcordionTestCase{
 """
-attributes="""
+attributes = """
     XmlRpcClient client = null;
 """
-constructor="""
+constructor = """
     public %(class_name)s() throws MalformedURLException{
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(new URL("http://localhost:%(port)s/"));
         this.client = new XmlRpcClient();
         this.client.setTypeFactory(new MyTypeFactory(this.client));
         this.client.setConfig(config);
+        System.setProperty("concordion.extensions", "org.concordion.ext.Extensions");
     }"""
 
-footer="""
+footer = """
 
     class MyTypeFactory extends TypeFactoryImpl {
     
@@ -96,13 +98,13 @@ add_test_template = '        suite.addTest(new TestSuite(%(class_full_path)s.cla
 void_methods = ["setUp", "tearDown"]
 
 class JavaClassGenerator:
-    
+
     def __init__(self, root_dir, configuration=None):
         if not configuration:
             configuration = {'server_port':1337}
         self.configuration = configuration
         self.root_dir = root_dir
-    
+
     def run(self, python_files):
         result = []
         for python_file in python_files:
@@ -115,17 +117,17 @@ class JavaClassGenerator:
             file(java_file, "w").write(java_content)
             result.append(python_file.replace(".py", ".java"))
         return result
-    
+
     def suite(self, java_files):
         add_tests = []
         for file in java_files:
-            file_from_root = os.path.abspath(file)[len(os.path.abspath(self.root_dir))+1:]
+            file_from_root = os.path.abspath(file)[len(os.path.abspath(self.root_dir)) + 1:]
             full_path = file_from_root.replace('.java', '').replace(os.sep, '.')
-            add_tests.append(add_test_template%{"class_full_path":full_path})
+            add_tests.append(add_test_template % {"class_full_path":full_path})
         suite_file = os.path.join(self.root_dir, "Suite.java")
-        open(suite_file, "w").write(suite_template%{"tests" : "\n".join(add_tests)})
+        open(suite_file, "w").write(suite_template % {"tests" : "\n".join(add_tests)})
         return suite_file
-    
+
     def generate(self, python_class, python_file):
         expected = "ExpectedToPass"
         try:
@@ -133,21 +135,21 @@ class JavaClassGenerator:
         except AttributeError:
             pass
         return "".join([self.generate_package(python_file),
-                        imports%{"expected" : expected}, 
-                        class_declaration%{"name":python_class.__name__, "expected" : expected}, 
-                        attributes, 
-                        constructor%{"class_name":python_class.__name__, "port":self.configuration.get('server_port')},
-                        "\n".join(self.generateMethods(python_class)), 
+                        imports % {"expected" : expected},
+                        class_declaration % {"name":python_class.__name__, "expected" : expected},
+                        attributes,
+                        constructor % {"class_name":python_class.__name__, "port":self.configuration.get('server_port')},
+                        "\n".join(self.generateMethods(python_class)),
                         footer])
-    
+
     def generate_package(self, python_file):
-        file_from_root = os.path.abspath(python_file)[len(os.path.abspath(self.root_dir))+1:]
+        file_from_root = os.path.abspath(python_file)[len(os.path.abspath(self.root_dir)) + 1:]
         file_package = os.path.split(file_from_root)[0]
         if file_package == "":
             return ""
         else:
-            return package%file_package.replace(os.sep, ".")
-    
+            return package % file_package.replace(os.sep, ".")
+
     def generateMethods(self, python_class):
         methods = []
         for method_name in dir(python_class):
@@ -155,41 +157,41 @@ class JavaClassGenerator:
                 method = getattr(python_class, method_name)
                 if isinstance(method, type(self.generateMethods)):
                     arguments = method.func_code.co_varnames[:method.func_code.co_argcount]
-                    arguments_list=", ".join(arguments[1:])
-                    arguments_declaration=", ".join(["String " + x for x in arguments[1:]])
+                    arguments_list = ", ".join(arguments[1:])
+                    arguments_declaration = ", ".join(["String " + x for x in arguments[1:]])
                     if method_name in void_methods:
-                        methods.append(void_method_template%{"name":method_name, "class_name":python_class.__name__})
+                        methods.append(void_method_template % {"name":method_name, "class_name":python_class.__name__})
                     else:
-                        methods.append(method_template%{"name":method_name, "class_name":python_class.__name__, "args_declaration":arguments_declaration, "args_list":arguments_list})
+                        methods.append(method_template % {"name":method_name, "class_name":python_class.__name__, "args_declaration":arguments_declaration, "args_list":arguments_list})
         return methods
-    
+
 class Classpath:
     def __init__(self, path):
         self.path = path
         self.directories = []
-    
+
     def getClasspath(self):
         files = glob.glob(os.path.join(self.path, "*.jar"))
         absolute_files = map(os.path.abspath, files)
         absolute_files.extend(self.directories)
         return '"' + os.pathsep.join(absolute_files) + '"'
-    
+
     def addDirectory(self, path):
         self.directories.append(path)
-        
+
     def removeDirectory(self, path):
         self.directories.remove(path)
-    
+
     def addDirectories(self, paths):
         for path in paths:
             self.addDirectory(path)
-        
+
 class JavaFileCompiler:
     def __init__(self, config, classpath, executor):
         self.configuration = config
         self.classpath = classpath
         self.executor = executor
-        
+
     def compile(self, javaFiles):
         command = " ".join([self.configuration.get("javac_command"), "-cp", self.classpath.getClasspath(), " ".join(javaFiles)])
         if self.executor.run(command) != 0:
@@ -197,20 +199,20 @@ class JavaFileCompiler:
         def modifyExtension(file):
             name, extension = os.path.splitext(file)
             return name + ".class"
-            
+
         return map(modifyExtension, javaFiles)
-        
+
 class JavaTestLauncher:
     def __init__(self, config, classpath, executor, root_dir):
         self.configuration = config
         self.classpath = classpath
         self.executor = executor
         self.root_dir = root_dir
-        
+
     def launch(self, classFile):
         (directory, name) = os.path.split(classFile)
         className = name.replace(".class", "")
-        package = os.path.abspath(directory)[len(os.path.abspath(self.root_dir))+1:].replace(os.sep, ".")
+        package = os.path.abspath(directory)[len(os.path.abspath(self.root_dir)) + 1:].replace(os.sep, ".")
         class_full_path = None
         if package == "":
             class_full_path = className
@@ -219,7 +221,7 @@ class JavaTestLauncher:
 
         self.classpath.addDirectory(self.root_dir)
         command = " ".join([self.configuration.get('java_command'),
-                "-Dconcordion.output.dir="+ self.configuration.get('output_folder'),
+                "-Dconcordion.output.dir=" + self.configuration.get('output_folder'),
                 "-cp",
                 self.classpath.getClasspath(),
                 "junit.textui.TestRunner",
