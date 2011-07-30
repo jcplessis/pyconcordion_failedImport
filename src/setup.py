@@ -2,7 +2,7 @@
 from distutils.core import setup
 
 setup(name='PyConcordion',
-      version='0.7.0',
+      version='0.8.0',
       description='Concordion python port',
       author='Plessis Jean-Christophe',
       author_email='jcplessis@gmail.com',
