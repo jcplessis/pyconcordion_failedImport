@@ -1,0 +1,28 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<body>
+
+    <h1>Python integration</h1>
+
+    <p>
+       <code>pyConcordion</code> provides a way to receive directly some parameters beside string
+    </p>
+
+    <div class="example">
+
+        <h3>Example</h3>
+
+		<p>When I want to add two integers, I don't have to convert them.</p>
+		
+		<span concordion:set="#a">42</span> + <span concordion:set="#b">1337</span> = <span concordion:assertEquals="add_integers(#a, #b)">1379</span>
+
+        <h3>Example</h3>
+
+		<p>When I want to add two floats, I don't have to convert them.</p>
+		
+		<span concordion:set="#a">3.14</span> + <span concordion:set="#b">2.2</span> = <span concordion:assertEquals="add_floats(#a, #b)">5.34</span>
+
+    </div>
+
+
+</body>
+</html>
