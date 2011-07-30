@@ -5,7 +5,7 @@ class XmlRpcServer:
     def __init__(self, configuration, files):
         self.configuration = configuration
         self.files = files
-    
+
     def launch(self):
         self.server = XMLRPCServerThread(int(self.configuration.get("server_port")))
         for file in self.files:
@@ -19,7 +19,7 @@ class XmlRpcServer:
         self.thread = threading.Thread(target=self.server)
         self.thread.setDaemon(True)
         self.thread.start()
-    
+
     def stop(self):
         try:
             self.server.stop()
@@ -31,16 +31,16 @@ class XmlRpcServer:
 class XMLRPCServerThread:
     def __init__(self, port):
         self.server = SimpleXMLRPCServer(("localhost", port), logRequests=False, allow_none=True)
-    
+
     def add_instance(self, instance):
         for key in dir(instance):
             attr = getattr(instance, key)
             if isinstance(attr, self.__init__.__class__):
-                self.server.register_function(attr, instance.__class__.__name__ + "_" + attr.__name__)
-        
+                self.server.register_function(attr, instance.__class__.__name__ + "_" + getattr(attr, "_real_name", attr.__name__))
+
     def __call__(self):
         self.server.serve_forever()
-        
+
     def stop(self):
         self.server.shutdown()
         self.server.server_close()

@@ -6,10 +6,16 @@ from optparse import OptionParser
 parser = OptionParser(
 	usage="USAGE: %prog [options] SOURCE_FOLDER", 
 	version="0.7.0",
-	description="Run all the pyConcordion tests contained in OUTPUT_FOLDER and sub folders."	
+	description="Run all the pyConcordion tests contained in SOURCE_FOLDER and sub folders."	
 )
 parser.add_option("-o", "--output_folder", 
-                  help="generate report in OUTPUT_FOLDER", metavar="OUTPUT_FOLDER")
+	help="generate report in OUTPUT_FOLDER", 
+	metavar="OUTPUT_FOLDER"
+)
+parser.add_option("-e", "--extensions", 
+	help="Activate concordion extensions. Value 'org.concordion.ext.Extensions' activates concordion-extensions.",
+	metavar="EXTENSION_NAME"
+)
 
 (options, args) = parser.parse_args()
 if len(args) != 1:
@@ -17,6 +23,8 @@ if len(args) != 1:
 real_options = {}
 if options.output_folder is not None:
 	real_options['output_folder'] = options.output_folder
+if options.extensions is not None:
+	real_options['extensions'] = options.extensions
 
 from concordion.runners import FolderRunner
 FolderRunner().run(args[0], real_options)
