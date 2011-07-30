@@ -1,0 +1,40 @@
+#summary How to use decorator on your test functions.
+
+= Introduction =
+
+As pyconcordion uses introspection on your test methods, adding a decorator would break the test process. Since pyconcordion 0.8 some modifications have been made to allow decorator usage.
+
+
+= Details =
+
+To create your decorator you should make sure that the decorator propagate the introspection data from the test method. Here is an exemple of a decorator with argument that works (and is actually included in concordion).
+
+{{{
+def concordion_convert_parameters(*converters):
+	def decorator(functor):
+		def func_call(self, *args):
+			real_args = []
+			for i, converter in enumerate(converters):
+				real_args.append(converter(args[i]))
+			return functor(self, *real_args)
+		# Save the func_code of the real test method
+		func_call.real_func_code = functor.func_code
+		# Save the name of the real test method
+		func_call._real_name = functor.__name__
+		return func_call
+	return decorator
+}}}
+
+For an argument less decorator : 
+
+{{{
+def print_hello(functor):
+	def func_call(self, *args):
+		print "Hello"
+		return functor(self, *real_args)
+	# Save the func_code of the real test method
+	func_call.real_func_code = functor.func_code
+	# Save the name of the real test method
+	func_call._real_name = functor.__name__
+	return func_call
+}}}
