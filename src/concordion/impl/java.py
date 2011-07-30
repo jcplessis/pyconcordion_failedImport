@@ -1,5 +1,6 @@
 import os
 import glob
+import sys
 
 package = """
 package %s;
@@ -112,6 +113,9 @@ class JavaClassGenerator:
 			python_module = {}
 			execfile(python_file, python_module)
 			python_class_name = os.path.split(python_file)[1].replace(".py", "");
+			if python_class_name not in python_module:
+				print "Class %s not found in %s file !!! Please make sure that your test class complies with the naming convention." % (python_class_name, python_file)
+				sys.exit(-1)
 			python_class = python_module[python_class_name]
 			java_content = self.generate(python_class, python_file)
 			file(java_file, "w").write(java_content)
