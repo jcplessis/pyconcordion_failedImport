@@ -1,0 +1,2 @@
+class indexTest:
+	pass
