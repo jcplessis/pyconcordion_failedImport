@@ -1,0 +1,30 @@
+##!/usr/bin/python
+
+import os, sys
+from optparse import OptionParser
+
+parser = OptionParser(
+	usage="USAGE: %prog [options] SOURCE_DIR SOURCE_FILE",
+	version="0.10.0",
+	description="Run the pyConcordion test referenced by SOURCE_FILE, using all tests from SOURCE_DIR in case of concodrion:run."
+)
+parser.add_option("-o", "--output_folder",
+	help="generate report in OUTPUT_FOLDER",
+	metavar="OUTPUT_FOLDER"
+)
+parser.add_option("-e", "--extensions",
+	help="Activate concordion extensions. Value 'org.concordion.ext.Extensions' activates concordion-extensions.",
+	metavar="EXTENSION_NAME"
+)
+
+(options, args) = parser.parse_args()
+if len(args) != 2:
+	parser.error("Incorrect number of arguments")
+real_options = {}
+if options.output_folder is not None:
+	real_options['output_folder'] = options.output_folder
+if options.extensions is not None:
+	real_options['extensions'] = options.extensions
+
+from concordion.runners import FolderRunner
+FolderRunner().run(args[0], file=args[1], options=real_options)
